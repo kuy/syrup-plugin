@@ -12,7 +12,8 @@ class Syrup {
     private static function init_hooks() {
         self::$initiated = true;
 
-        add_action( 'wp_footer', array( 'Syrup', 'hook_wp_footer' ) );
+        add_filter( 'wp_enqueue_scripts', array( 'Syrup', 'hook_wp_enqueue_scripts' ) );
+        add_filter( 'the_content', array( 'Syrup', 'hook_the_content' ) );
     }
 
     public static function view( $name, array $args = array() ) {
@@ -23,6 +24,22 @@ class Syrup {
         $file = SYRUP__PLUGIN_DIR . 'views/'. $name . '.php';
 
         include( $file );
+    }
+
+    public static function get_shops( $post_id ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_shops';
+        $shops = $wpdb->get_results(
+            "
+            SELECT *
+            FROM $table_name
+            WHERE post_id = $post_id
+            LIMIT 10
+            "
+        , ARRAY_A );
+
+        return $shops;
     }
 
     public static function plugin_install() {
@@ -77,7 +94,33 @@ class Syrup {
         dbDelta( $sql );
     }
 
-    public static function hook_wp_footer() {
-        echo '<strong>NYAA!</strong>';
+    public static function hook_wp_enqueue_scripts() {
+        wp_enqueue_style( 'syrup-style', SYRUP__PLUGIN_URL . 'css/style.css' );
+        wp_enqueue_script( 'syrup-google-maps', '//maps.googleapis.com/maps/api/js?key=AIzaSyBKVdsaN43VQGayTc1thF-faFjpzZUrqCo' );
+        wp_enqueue_script( 'syrup-core', SYRUP__PLUGIN_URL . 'js/core.js' );
+    }
+
+    public static function hook_the_content( $content ) {
+        $post_id = get_the_ID();
+
+        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;" />';
+
+        $items = array();
+        foreach ( self::get_shops( $post_id ) as $shop ) {
+            $items[] = "{
+                name: '{$shop['name']}',
+                coordinate: '{$shop['lat']}, {$shop['lng']}'
+            }";
+        }
+        $items = join( ', ', $items );
+        $content .= "<script>SPOTS = [{$items}];</script>";
+
+        $content .= '<ul>';
+        foreach ( self::get_shops( $post_id ) as $shop ) {
+            $content .= "<li>{$shop['name']}</li>";
+        }
+        $content .= '</ul>';
+
+        return $content;
     }
 }
