@@ -1,0 +1,11 @@
+#syrup-shop-hours-editor-template {
+  display: none;
+}
+
+#syrup-shop-hours-editor .wd-group {
+  margin: 0 14px;
+}
+
+#syrup-shop-hours-editor a.delete {
+  color: red;
+}

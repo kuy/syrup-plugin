@@ -12,7 +12,7 @@ class Syrup {
     private static function init_hooks() {
         self::$initiated = true;
 
-        add_filter( 'wp_enqueue_scripts', array( 'Syrup', 'hook_wp_enqueue_scripts' ) );
+        add_action( 'wp_enqueue_scripts', array( 'Syrup', 'hook_wp_enqueue_scripts' ) );
         add_filter( 'the_content', array( 'Syrup', 'hook_the_content' ) );
     }
 
@@ -40,6 +40,87 @@ class Syrup {
         , ARRAY_A );
 
         return $shops;
+    }
+
+    public static function get_shops_by_ids( $shop_ids ) {
+        global $wpdb;
+
+        if ( count( $shop_ids ) === 0 ) {
+            return array();
+        }
+
+        $list = join( ',', $shop_ids );
+
+        $table_name = $wpdb->prefix . 'syrup_shops';
+        $shops = $wpdb->get_results(
+            "
+            SELECT *
+            FROM $table_name
+            WHERE shop_id IN ($list)
+            LIMIT 200
+            "
+        , ARRAY_A );
+
+        return $shops;
+    }
+
+    public static function get_shops_by_category( $category ) {
+        global $wpdb;
+
+        $shops = array();
+        $table_name = $wpdb->prefix . 'syrup_shops';
+        $cat = get_category_by_slug( $category );
+        $posts = get_posts( array( 'category' => $cat->term_id, 'posts_per_page' => 200 ) );
+
+        foreach ( $posts as $post ) {
+            $items = self::get_shops( $post->ID );
+            $shops = array_merge( $shops, $items );
+        }
+
+        return $shops;
+    }
+
+    public static function get_shops_of_open( $category ) {
+        global $wpdb;
+
+        $now = intval( strftime( '%H%M' ), 10 ) + 900;
+        if ( 2400 <= $now ) {
+            $now -= 2400;
+        }
+
+        $table_name = $wpdb->prefix . 'syrup_shop_hours';
+        $shop_hours = $wpdb->get_results(
+            "
+            SELECT shop_id
+            FROM $table_name
+            WHERE open <= $now AND close > $now
+            GROUP BY shop_id
+            LIMIT 100
+            "
+        , ARRAY_A );
+
+        $shop_ids = array();
+        foreach ( $shop_hours as $shop_hour ) {
+            array_push( $shop_ids, $shop_hour['shop_id'] );
+        }
+
+        return self::get_shops_by_ids( $shop_ids );
+    }
+
+    public static function get_shop_hours( $shop_id ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_shop_hours';
+        $shop_hours = $wpdb->get_results(
+            "
+            SELECT *
+            FROM $table_name
+            WHERE shop_id = $shop_id
+            LIMIT 20
+            "
+        , ARRAY_A );
+
+        return $shop_hours;
     }
 
     public static function plugin_install() {
@@ -101,12 +182,28 @@ class Syrup {
     }
 
     public static function hook_the_content( $content ) {
-        $post_id = get_the_ID();
+        $target_id = get_the_ID();
 
-        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;" />';
+        if ( is_page( $target_id ) ) {
+            $cat = get_post_meta( $target_id, 'syrup-category', true );
+            $type = get_post_meta( $target_id, 'syrup-type', true );
+
+            switch ($type) {
+                case 'area':
+                    $shops = self::get_shops_by_category( $cat );
+                    break;
+                case 'now':
+                    $shops = self::get_shops_of_open( $cat );
+                    break;
+            }
+        } else if ( is_single( $target_id ) ) {
+            $shops = self::get_shops( $target_id );
+        } else {
+            return $content;
+        }
 
         $items = array();
-        foreach ( self::get_shops( $post_id ) as $shop ) {
+        foreach ( $shops as $shop ) {
             $items[] = "{
                 name: '{$shop['name']}',
                 coordinate: '{$shop['lat']}, {$shop['lng']}'
@@ -116,10 +213,12 @@ class Syrup {
         $content .= "<script>SPOTS = [{$items}];</script>";
 
         $content .= '<ul>';
-        foreach ( self::get_shops( $post_id ) as $shop ) {
+        foreach ( $shops as $shop ) {
             $content .= "<li>{$shop['name']}</li>";
         }
         $content .= '</ul>';
+
+        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;" />';
 
         return $content;
     }

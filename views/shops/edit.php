@@ -5,7 +5,7 @@
 
     <form action="admin-post.php" method="post">
         <input type="hidden" name="action" value="syrup_shops_update">
-        <input type="hidden" name="shop_id" value="<?php echo $shop['shop_id']; ?>">
+        <input type="hidden" name="shop_id" value="<?= $shop['shop_id'] ?>">
 
         <table class="form-table">
             <tbody>
@@ -14,7 +14,7 @@
                         <label for="shop_name">Name</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_name" name="shop_name" value="<?php echo $shop['name']; ?>">
+                        <input type="text" id="shop_name" name="shop_name" value="<?= $shop['name'] ?>">
                     </td>
                 </tr>
                 <tr class="form-field form-required">
@@ -22,8 +22,8 @@
                         <label for="shop_location">Location</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_lat" name="shop_lat" value="<?php echo $shop['lat']; ?>">
-                        <input type="text" id="shop_lng" name="shop_lng" value="<?php echo $shop['lng']; ?>">
+                        <input type="text" id="shop_lat" name="shop_lat" value="<?= $shop['lat'] ?>">
+                        <input type="text" id="shop_lng" name="shop_lng" value="<?= $shop['lng'] ?>">
                     </td>
                 </tr>
                 <tr class="form-field">
@@ -31,7 +31,7 @@
                         <label for="shop_url">URL</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_url" name="shop_url" value="<?php echo $shop['url']; ?>">
+                        <input type="text" id="shop_url" name="shop_url" value="<?= $shop['url'] ?>">
                     </td>
                 </tr>
                 <tr class="form-field">
@@ -39,7 +39,7 @@
                         <label for="shop_post_id">Post ID</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_post_id" name="shop_post_id" value="<?php echo $shop['post_id']; ?>">
+                        <input type="text" id="shop_post_id" name="shop_post_id" value="<?= $shop['post_id'] ?>">
                     </td>
                 </tr>
                 <tr class="form-field">
@@ -47,7 +47,7 @@
                         <label for="shop_group_id">Group ID</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_group_id" name="shop_group_id" value="<?php echo $shop['group_id']; ?>">
+                        <input type="text" id="shop_group_id" name="shop_group_id" value="<?= $shop['group_id'] ?>">
                     </td>
                 </tr>
             </tbody>
@@ -57,4 +57,77 @@
             <input type="submit" class="button button-primary" value="Save">
         </p>
     </form>
+
+    <h2>
+        Edit Shop Hours
+        <a href="#" class="add-new-h2" id="syrup-shop-hours-editor-new">Add New</a>
+    </h2>
+
+    <?php
+    $wd_list = array( 'wd0' => 'Sun', 'wd1' => 'Mon', 'wd2' => 'Tue',
+                      'wd3' => 'Wed', 'wd4' => 'Thu', 'wd5' => 'Fri', 'wd6' => 'Sat' );
+    ?>
+
+    <div id="syrup-shop-hours-editor">
+        <div id="syrup-shop-hours-editor-template">
+            <li>
+                <input type="text" name="hour_open_h[]" size="2" maxlength="2" />
+                :
+                <input type="text" name="hour_open_m[]" size="2" maxlength="2" />
+                -
+                <input type="text" name="hour_close_h[]" size="2" maxlength="2" />
+                :
+                <input type="text" name="hour_close_m[]" size="2" maxlength="2" />
+
+                <span class="wd-group">
+                    <?php foreach ( $wd_list as $key => $wd ): ?>
+                    <label class="syrup-toggle"">
+                        <input type="hidden" name="hour_<?= $key ?>[]" />
+                        <input type="checkbox" />
+                        <?= $wd ?>
+                    </label>
+                    <?php endforeach; ?>
+                </span>
+
+                <a href="#" class="delete">Delete</a>
+            </li>
+        </div>
+
+        <form action="admin-post.php" method="post">
+            <input type="hidden" name="action" value="syrup_shop_hours_update">
+            <input type="hidden" name="shop_id" value="<?= $shop['shop_id'] ?>">
+
+            <ul>
+                <?php foreach ( $hours as $shop_hour ): ?>
+                <?php $open = sprintf( '%04d', $shop_hour['open'] ); ?>
+                <?php $close = sprintf( '%04d', $shop_hour['close'] ); ?>
+                <li>
+                    <input type="text" name="hour_open_h[]" value="<?= intval( mb_substr( $open, 0, 2 ) ) ?>" size="2" maxlength="2" />
+                    :
+                    <input type="text" name="hour_open_m[]" value="<?= intval( mb_substr( $open, 2, 2 ) ) ?>" size="2" maxlength="2" />
+                    -
+                    <input type="text" name="hour_close_h[]" value="<?= intval( mb_substr( $close, 0, 2 ) ) ?>" size="2" maxlength="2" />
+                    :
+                    <input type="text" name="hour_close_m[]" value="<?= intval( mb_substr( $close, 2, 2 ) ) ?>" size="2" maxlength="2" />
+
+                    <span class="wd-group">
+                        <?php foreach ( $wd_list as $key => $wd ): ?>
+                        <label class="syrup-toggle"">
+                            <input type="hidden" name="hour_<?= $key ?>[]" />
+                            <input type="checkbox" <?= $shop_hour[$key] ? 'checked="checked"' : '' ?> />
+                            <?= $wd ?>
+                        </label>
+                        <?php endforeach; ?>
+                    </span>
+
+                    <a href="#" class="delete">Delete</a>
+                </li>
+                <?php endforeach; ?>
+            </ul>
+
+            <p class="submit">
+                <input type="submit" class="button button-primary" value="Save">
+            </p>
+        </form>
+    </div>
 </div>

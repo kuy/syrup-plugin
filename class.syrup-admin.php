@@ -12,12 +12,19 @@ class Syrup_Admin {
     private static function init_hooks() {
         self::$initiated = true;
 
-        add_action( 'admin_menu', array( 'Syrup_Admin', 'setup_menu' ) );
+        add_action( 'admin_enqueue_scripts', array( 'Syrup_Admin', 'hook_admin_enqueue_scripts' ) );
+        add_action( 'admin_menu', array( 'Syrup_Admin', 'hook_admin_menu' ) );
         add_action( 'admin_post_syrup_shops_create', array( 'Syrup_Admin', 'action_shops_create' ) );
         add_action( 'admin_post_syrup_shops_update', array( 'Syrup_Admin', 'action_shops_update' ) );
+        add_action( 'admin_post_syrup_shop_hours_update', array( 'Syrup_Admin', 'action_shop_hours_update' ) );
     }
 
-    public static function setup_menu() {
+    public static function hook_admin_enqueue_scripts() {
+        wp_enqueue_style( 'syrup-admin', SYRUP__PLUGIN_URL . 'css/admin.css' );
+        wp_enqueue_script( 'syrup-admin', SYRUP__PLUGIN_URL . 'js/admin.js' );
+    }
+
+    public static function hook_admin_menu() {
         add_menu_page( 'Shops', 'Shops', 'manage_options', 'syrup', array( 'Syrup_Admin', 'view_shops_index' ) );
         add_submenu_page( 'syrup', 'Groups', 'Groups', 'manage_options', 'syrup-groups', array( 'Syrup_Admin', 'view_groups_index' ) );
 
@@ -60,7 +67,16 @@ class Syrup_Admin {
             "
         , ARRAY_A );
 
-        Syrup::view( 'shops/edit', array( 'shop' => $shop ) );
+        $table_name = $wpdb->prefix . 'syrup_shop_hours';
+        $hours = $wpdb->get_results(
+            "
+            SELECT *
+            FROM $table_name
+            WHERE shop_id = $shop_id
+            "
+        , ARRAY_A );
+
+        Syrup::view( 'shops/edit', array( 'shop' => $shop, 'hours' => $hours ) );
     }
 
     public static function view_groups_index() {
@@ -105,6 +121,47 @@ class Syrup_Admin {
         // TODO: handle error
 
         wp_safe_redirect( self::url_shops_index() );
+    }
+
+    public static function action_shop_hours_update() {
+        global $wpdb;
+
+        $shop_id = $_POST['shop_id'];
+
+        $table_name = $wpdb->prefix . 'syrup_shop_hours';
+
+        // Delete all shop hours binded this shop
+        $wpdb->delete( $table_name, array( 'shop_id' => $shop_id ), array( '%d' ) );
+
+        // Enumerate new shop hours and insert them
+        $i = 0;
+        foreach ( $_POST['hour_open_h'] as $_ ) {
+            foreach ( array( 'hour_open_h', 'hour_open_m', 'hour_close_h', 'hour_close_m' ) as $key ) {
+                if ($_POST[$key][$i] == '') {
+                    $_POST[$key][$i] = '0';
+                }
+            }
+
+            $open = 100 * intval($_POST['hour_open_h'][$i]) + intval($_POST['hour_open_m'][$i]);
+            $close = 100 * intval($_POST['hour_close_h'][$i]) + intval($_POST['hour_close_m'][$i]);
+
+            $wpdb->insert( $table_name, array(
+                'shop_id' => $shop_id,
+                'open' => $open,
+                'close' => $close,
+                'wd0' => $_POST['hour_wd0'][$i] == 'on',
+                'wd1' => $_POST['hour_wd1'][$i] == 'on',
+                'wd2' => $_POST['hour_wd2'][$i] == 'on',
+                'wd3' => $_POST['hour_wd3'][$i] == 'on',
+                'wd4' => $_POST['hour_wd4'][$i] == 'on',
+                'wd5' => $_POST['hour_wd5'][$i] == 'on',
+                'wd6' => $_POST['hour_wd6'][$i] == 'on',
+            ), array( '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d' ) );
+
+            $i++;
+        }
+
+        wp_safe_redirect( self::url_shops_edit( $shop_id ) );
     }
 
     public static function url_shops_index() {

@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Syrup
-Description: Location spices to WordPress.
+Description: Creates the database for shop data and integrates into Wordpress.
 Version: 0.1.0
 Author: Yuki Kodama
 Author URI: http://endflow.net/
