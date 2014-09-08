@@ -178,7 +178,7 @@ class Syrup {
     public static function hook_wp_enqueue_scripts() {
         wp_enqueue_style( 'syrup-style', SYRUP__PLUGIN_URL . 'css/style.css' );
         wp_enqueue_script( 'syrup-google-maps', '//maps.googleapis.com/maps/api/js?key=AIzaSyBKVdsaN43VQGayTc1thF-faFjpzZUrqCo' );
-        wp_enqueue_script( 'syrup-core', SYRUP__PLUGIN_URL . 'js/core.js' );
+        wp_enqueue_script( 'syrup-core', SYRUP__PLUGIN_URL . 'js/core.js', array( 'jquery' ) );
     }
 
     public static function hook_the_content( $content ) {
