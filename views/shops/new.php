@@ -3,7 +3,7 @@
 
     <p></p>
 
-    <form action="admin-post.php" method="post">
+    <form action="admin-post.php" method="post" id="createshop">
         <input type="hidden" name="action" value="syrup_shops_create">
 
         <table class="form-table">
@@ -21,8 +21,8 @@
                         <label for="shop_location">Location</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_lat" name="shop_lat">
-                        <input type="text" id="shop_lng" name="shop_lng">
+                        <input type="text" id="shop_lat" name="shop_lat" class="half-text">
+                        <input type="text" id="shop_lng" name="shop_lng" class="half-text">
                     </td>
                 </tr>
                 <tr class="form-field">
@@ -38,7 +38,14 @@
                         <label for="shop_post_id">Post ID</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_post_id" name="shop_post_id">
+                        <select id="shop_post_id" name="shop_post_id">
+                            <option value="" selected="selected"></option>
+                            <?php foreach ( get_posts( array( 'posts_per_page' => 200, 'post_status' => 'any' ) ) as $post ): ?>
+                            <option value="<?= $post->ID ?>">
+                                <?= $post->post_title ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </td>
                 </tr>
                 <tr class="form-field">

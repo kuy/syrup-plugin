@@ -9,3 +9,11 @@
 #syrup-shop-hours-editor a.delete {
   color: red;
 }
+
+#createshop .form-field input, #updateshop .form-field input {
+    width: 25em;
+}
+
+#createshop .form-field input.half-text, #updateshop .form-field input.half-text {
+    width: 10em;
+}
