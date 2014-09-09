@@ -10,10 +10,17 @@
   color: red;
 }
 
+#syrup-location-preview-map {
+  position: absolute;
+  left: 640px;
+  width: 320px;
+  height: 320px;
+}
+
 #createshop .form-field input, #updateshop .form-field input {
-    width: 25em;
+  width: 25em;
 }
 
 #createshop .form-field input.half-text, #updateshop .form-field input.half-text {
-    width: 10em;
+  width: 10em;
 }

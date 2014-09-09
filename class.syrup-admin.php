@@ -21,6 +21,7 @@ class Syrup_Admin {
 
     public static function hook_admin_enqueue_scripts() {
         wp_enqueue_style( 'syrup-admin', SYRUP__PLUGIN_URL . 'css/admin.css' );
+        wp_enqueue_script( 'syrup-google-maps', '//maps.googleapis.com/maps/api/js?key=AIzaSyBKVdsaN43VQGayTc1thF-faFjpzZUrqCo' );
         wp_enqueue_script( 'syrup-admin', SYRUP__PLUGIN_URL . 'js/admin.js' );
     }
 

@@ -218,7 +218,7 @@ class Syrup {
         }
         $content .= '</ul>';
 
-        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;" />';
+        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;"></div>';
 
         return $content;
     }

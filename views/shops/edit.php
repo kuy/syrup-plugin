@@ -7,6 +7,8 @@
         <input type="hidden" name="action" value="syrup_shops_update">
         <input type="hidden" name="shop_id" value="<?= $shop['shop_id'] ?>">
 
+        <div id="syrup-location-preview-map" style="width: 320px; height: 320px;"></div>
+
         <table class="form-table">
             <tbody>
                 <tr class="form-field form-required">
@@ -22,8 +24,10 @@
                         <label for="shop_location">Location</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_lat" name="shop_lat" class="half-text" value="<?= $shop['lat'] ?>">
-                        <input type="text" id="shop_lng" name="shop_lng" class="half-text" value="<?= $shop['lng'] ?>">
+                        <div class="syrup-location-preview" data-map="syrup-location-preview-map">
+                            <input type="text" id="shop_lat" name="shop_lat" class="half-text lat" value="<?= $shop['lat'] ?>">
+                            <input type="text" id="shop_lng" name="shop_lng" class="half-text lng" value="<?= $shop['lng'] ?>">
+                        </div>
                     </td>
                 </tr>
                 <tr class="form-field">
