@@ -35,7 +35,7 @@ class Syrup {
             SELECT *
             FROM $table_name
             WHERE post_id = $post_id
-            LIMIT 10
+            LIMIT 200
             "
         , ARRAY_A );
 

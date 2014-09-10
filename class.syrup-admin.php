@@ -42,7 +42,7 @@ class Syrup_Admin {
             "
             SELECT *
             FROM $table_name
-            LIMIT 10
+            LIMIT 200
             "
         , ARRAY_A );
 
