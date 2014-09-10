@@ -1,6 +1,6 @@
 jQuery(document).ready(function($) {
   // Shop Hours Editor
-  var syrup_toggle = function(){
+  var syrupToggle = function(){
     $('.syrup-toggle').each(function(){
       var hidden = $(this).find('input[type="hidden"]');
       var checkbox = $(this).find('input[type="checkbox"]');
@@ -20,12 +20,12 @@ jQuery(document).ready(function($) {
       e.preventDefault();
 
       $('#syrup-shop-hours-editor-template > li').clone().appendTo(list);
-      syrup_toggle();
+      syrupToggle();
     });
   }
 
   form.submit(function(){
-    syrup_toggle();
+    syrupToggle();
   });
 
   editor.on('click', 'a.delete', function(e){
@@ -34,16 +34,23 @@ jQuery(document).ready(function($) {
     $(this).parents('li').remove();
   });
 
-  syrup_toggle();
+  syrupToggle();
 
-  // Location Preview
+  // Location Mini Map
   $('.syrup-location-preview').each(function(){
     var root = $(this);
-    var update = function(){
-      var id = root.data('map');
+    var getPos = function(){
       var lat = root.find('input.lat').val();
       var lng = root.find('input.lng').val();
-      var pos = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
+      return new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
+    };
+    var setPos = function(pos){
+      root.find('input.lat').val(pos.lat());
+      root.find('input.lng').val(pos.lng());
+    };
+    var update = function(){
+      var id = root.data('map');
+      var pos = getPos();
       var map = root.data('instance');
       if (!map) {
         map = new google.maps.Map(document.getElementById(id), { zoom: 15 });
@@ -54,7 +61,11 @@ jQuery(document).ready(function($) {
       if (!marker) {
         marker = new google.maps.Marker({
           position: pos,
-          map: map
+          map: map,
+          draggable: true
+        });
+        google.maps.event.addListener(marker, 'dragend', function(){
+          setPos(marker.getPosition());
         });
         root.data('marker', marker);
       }

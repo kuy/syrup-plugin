@@ -23,9 +23,9 @@ jQuery(document).ready(function($) {
     }
 
     google.maps.event.addListenerOnce(map, 'bounds_changed', function(){
-        if (15 < map.getZoom()) {
-            map.setZoom(15);
-        }
+      if (15 < map.getZoom()) {
+        map.setZoom(15);
+      }
     });
 
     map.fitBounds(bounds);
