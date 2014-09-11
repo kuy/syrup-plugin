@@ -83,17 +83,25 @@ class Syrup {
     public static function get_shops_of_open( $category ) {
         global $wpdb;
 
-        $now = intval( strftime( '%H%M' ), 10 ) + 900;
-        if ( 2400 <= $now ) {
-            $now -= 2400;
+        $now_list = array( intval( strftime( '%H%M' ), 10 ) + 900 );
+        if ( 2400 <= $now_list[0] ) {
+            array_push( $now_list, $now_list[0] - 2400 );
         }
+
+        $cond_list = array();
+        foreach ( $now_list as $now ) {
+            array_push( $cond_list, "open <= $now AND close > $now" );
+        }
+
+        $time_cond = join( ' OR ', $cond_list );
+        $wd_cond = 'wd' . strftime( '%w' ) . ' = 1';
 
         $table_name = $wpdb->prefix . 'syrup_shop_hours';
         $shop_hours = $wpdb->get_results(
             "
             SELECT shop_id
             FROM $table_name
-            WHERE open <= $now AND close > $now
+            WHERE ($time_cond) AND ($wd_cond)
             GROUP BY shop_id
             LIMIT 100
             "
