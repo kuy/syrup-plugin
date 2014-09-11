@@ -16,6 +16,8 @@ class Syrup_Admin {
         add_action( 'admin_menu', array( 'Syrup_Admin', 'hook_admin_menu' ) );
         add_action( 'admin_post_syrup_shops_create', array( 'Syrup_Admin', 'action_shops_create' ) );
         add_action( 'admin_post_syrup_shops_update', array( 'Syrup_Admin', 'action_shops_update' ) );
+        add_action( 'admin_post_syrup_groups_create', array( 'Syrup_Admin', 'action_groups_create' ) );
+        add_action( 'admin_post_syrup_groups_update', array( 'Syrup_Admin', 'action_groups_update' ) );
         add_action( 'admin_post_syrup_shop_hours_update', array( 'Syrup_Admin', 'action_shop_hours_update' ) );
     }
 
@@ -32,6 +34,7 @@ class Syrup_Admin {
         add_submenu_page( NULL, 'Add New Shop', '', 'manage_options', 'syrup-shops-new', array( 'Syrup_Admin', 'view_shops_new' ) );
         add_submenu_page( NULL, 'Edit Shop', '', 'manage_options', 'syrup-shops-edit', array( 'Syrup_Admin', 'view_shops_edit' ) );
         add_submenu_page( NULL, 'Add New Group', '', 'manage_options', 'syrup-groups-new', array( 'Syrup_Admin', 'view_groups_new' ) );
+        add_submenu_page( NULL, 'Edit Group', '', 'manage_options', 'syrup-groups-edit', array( 'Syrup_Admin', 'view_groups_edit' ) );
     }
 
     public static function view_shops_index() {
@@ -81,11 +84,29 @@ class Syrup_Admin {
     }
 
     public static function view_groups_index() {
-        Syrup::view( 'groups/index' );
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_groups';
+        $groups = $wpdb->get_results(
+            "
+            SELECT *
+            FROM $table_name
+            LIMIT 200
+            "
+        , ARRAY_A );
+
+        Syrup::view( 'groups/index', array( 'groups' => $groups ) );
     }
 
     public static function view_groups_new() {
         Syrup::view( 'groups/new' );
+    }
+
+    public static function view_groups_edit() {
+        $group_id = $_GET['group_id'];
+        $group = Syrup::get_group( $group_id );
+
+        Syrup::view( 'groups/edit', array( 'group' => $group ) );
     }
 
     public static function action_shops_create() {
@@ -122,6 +143,32 @@ class Syrup_Admin {
         // TODO: handle error
 
         wp_safe_redirect( self::url_shops_index() );
+    }
+
+    public static function action_groups_create() {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_groups';
+        $wpdb->insert( $table_name, array(
+            'name' => $_POST['group_name'],
+        ), array( '%s' ) );
+
+        wp_safe_redirect( self::url_groups_index() );
+    }
+
+    public static function action_groups_update() {
+        global $wpdb;
+
+        $group_id = $_POST['group_id'];
+
+        $table_name = $wpdb->prefix . 'syrup_groups';
+        $result = $wpdb->update( $table_name, array(
+            'name' => $_POST['group_name'],
+        ), array( 'group_id' => $group_id ), array( '%s' ), array( '%d' ) );
+
+        // TODO: handle error
+
+        wp_safe_redirect( self::url_groups_index() );
     }
 
     public static function action_shop_hours_update() {
@@ -174,6 +221,18 @@ class Syrup_Admin {
     public static function url_shops_edit( $shop_id ) {
         $base = admin_url( 'admin.php' );
         $url = add_query_arg( array( 'page' => 'syrup-shops-edit', 'shop_id' => $shop_id ), $base );
+        return $url;
+    }
+
+    public static function url_groups_index() {
+        $base = admin_url( 'admin.php' );
+        $url = add_query_arg( array( 'page' => 'syrup-groups' ), $base );
+        return $url;
+    }
+
+    public static function url_groups_edit( $group_id ) {
+        $base = admin_url( 'admin.php' );
+        $url = add_query_arg( array( 'page' => 'syrup-groups-edit', 'group_id' => $group_id ), $base );
         return $url;
     }
 }

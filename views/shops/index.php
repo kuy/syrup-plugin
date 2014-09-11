@@ -16,22 +16,30 @@
         <tbody>
             <?php foreach ( $shops as $shop ): ?>
             <tr>
-                <td><?php echo $shop['shop_id']; ?></td>
+                <td><?= $shop['shop_id'] ?></td>
                 <td>
-                    <a href="<?php echo Syrup_Admin::url_shops_edit( $shop['shop_id'] ); ?>">
-                        <?php echo $shop['name']; ?>
+                    <a href="<?= Syrup_Admin::url_shops_edit( $shop['shop_id'] ) ?>">
+                        <?= $shop['name'] ?>
                     </a>
                 </td>
                 <td>
                     <?php
                     $post = get_post( $shop['post_id'] );
                     if ($post): ?>
-                        <a href="<?php echo get_edit_post_link( $post->ID ); ?>">
-                            <?php echo $post->post_title; ?>
+                        <a href="<?= get_edit_post_link( $post->ID ) ?>">
+                            <?= $post->post_title ?>
                         </a>
                     <?php endif; ?>
                 </td>
-                <td><?php echo $shop['group_id']; ?></td>
+                <td>
+                    <?php
+                    $group = Syrup::get_group( $shop['group_id'] );
+                    if ($group): ?>
+                        <a href="<?= Syrup_Admin::url_groups_edit( $group['group_id'] ) ?>">
+                            <?= $group['name'] ?>
+                        </a>
+                    <?php endif; ?>
+                </td>
             </tr>
             <?php endforeach; ?>
         </tbody>

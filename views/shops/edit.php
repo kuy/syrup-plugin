@@ -40,10 +40,11 @@
                 </tr>
                 <tr class="form-field">
                     <th scope="row">
-                        <label for="shop_post_id">Post ID</label>
+                        <label for="shop_post_id">Post</label>
                     </th>
                     <td>
                         <select id="shop_post_id" name="shop_post_id" value="<?= $shop['post_id'] ?>">
+                            <option value=""></option>
                             <?php foreach ( get_posts( array( 'posts_per_page' => 200, 'post_status' => 'any' ) ) as $post ): ?>
                             <option value="<?= $post->ID ?>" <?= $shop['post_id'] == $post->ID ? 'selected="selected"' : '' ?>>
                                 <?= $post->post_title ?>
@@ -54,10 +55,17 @@
                 </tr>
                 <tr class="form-field">
                     <th scope="row">
-                        <label for="shop_group_id">Group ID</label>
+                        <label for="shop_group_id">Group</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_group_id" name="shop_group_id" value="<?= $shop['group_id'] ?>">
+                        <select id="shop_group_id" name="shop_group_id" value="<?= $shop['group_id'] ?>">
+                            <option value=""></option>
+                            <?php foreach ( Syrup::get_groups() as $group ): ?>
+                            <option value="<?= $group['group_id'] ?>" <?= $shop['group_id'] == $group['group_id'] ? 'selected="selected"' : '' ?>>
+                                <?= $group['name'] ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </td>
                 </tr>
             </tbody>

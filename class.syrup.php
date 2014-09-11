@@ -65,10 +65,7 @@ class Syrup {
     }
 
     public static function get_shops_by_category( $category ) {
-        global $wpdb;
-
         $shops = array();
-        $table_name = $wpdb->prefix . 'syrup_shops';
         $cat = get_category_by_slug( $category );
         $posts = get_posts( array( 'category' => $cat->term_id, 'posts_per_page' => 200 ) );
 
@@ -76,6 +73,22 @@ class Syrup {
             $items = self::get_shops( $post->ID );
             $shops = array_merge( $shops, $items );
         }
+
+        return $shops;
+    }
+
+    public static function get_shops_by_group( $group_id ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_shops';
+        $shops = $wpdb->get_results(
+            "
+            SELECT *
+            FROM $table_name
+            WHERE group_id = $group_id
+            LIMIT 200
+            "
+        , ARRAY_A );
 
         return $shops;
     }
@@ -129,6 +142,51 @@ class Syrup {
         , ARRAY_A );
 
         return $shop_hours;
+    }
+
+    public static function get_group( $group_id ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_groups';
+        $group = $wpdb->get_row(
+            "
+            SELECT *
+            FROM $table_name
+            WHERE group_id = $group_id
+            "
+        , ARRAY_A );
+
+        return $group;
+    }
+
+    public static function get_groups() {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_groups';
+        $groups = $wpdb->get_results(
+            "
+            SELECT *
+            FROM $table_name
+            LIMIT 200
+            "
+        , ARRAY_A );
+
+        return $groups;
+    }
+
+    public static function get_num_of_shops( $group_id ) {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'syrup_shops';
+        $num = $wpdb->get_var(
+            "
+            SELECT COUNT(*)
+            FROM $table_name
+            WHERE group_id = $group_id
+            "
+        );
+
+        return $num;
     }
 
     public static function plugin_install() {

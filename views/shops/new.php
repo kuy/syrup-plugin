@@ -35,7 +35,7 @@
                 </tr>
                 <tr class="form-field">
                     <th scope="row">
-                        <label for="shop_post_id">Post ID</label>
+                        <label for="shop_post_id">Post</label>
                     </th>
                     <td>
                         <select id="shop_post_id" name="shop_post_id">
@@ -50,10 +50,17 @@
                 </tr>
                 <tr class="form-field">
                     <th scope="row">
-                        <label for="shop_group_id">Group ID</label>
+                        <label for="shop_group_id">Group</label>
                     </th>
                     <td>
-                        <input type="text" id="shop_group_id" name="shop_group_id">
+                        <select id="shop_group_id" name="shop_group_id">
+                            <option value="" selected="selected"></option>
+                            <?php foreach ( Syrup::get_groups() as $group ): ?>
+                            <option value="<?= $group['group_id'] ?>">
+                                <?= $group['name'] ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </td>
                 </tr>
             </tbody>

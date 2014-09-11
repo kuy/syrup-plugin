@@ -17,10 +17,12 @@
   height: 320px;
 }
 
-#createshop .form-field input, #updateshop .form-field input {
+#createshop .form-field input, #updateshop .form-field input,
+#creategroup .form-field input, #updategroup .form-field input {
   width: 25em;
 }
 
-#createshop .form-field input.half-text, #updateshop .form-field input.half-text {
+#createshop .form-field input.half-text, #updateshop .form-field input.half-text,
+#creategroup .form-field input.half-text, #updategroup .form-field input.half-text {
   width: 10em;
 }
