@@ -15,7 +15,7 @@ if ( !function_exists( 'add_action' ) ) {
 }
 
 define( 'SYRUP_VERSION', '0.1.0' );
-define( 'SYRUP_DB_VERSION', '1' );
+define( 'SYRUP_DB_VERSION', '2' );
 define( 'SYRUP__MINIMUM_WP_VERSION', '3.9' );
 define( 'SYRUP__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'SYRUP__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -28,4 +28,5 @@ add_action( 'init', array( 'Syrup', 'init' ) );
 if ( is_admin() ) {
     require_once( SYRUP__PLUGIN_DIR . 'class.syrup-admin.php' );
     add_action( 'init', array( 'Syrup_Admin', 'init' ) );
+    add_action( 'plugins_loaded', array( 'Syrup', 'hook_plugins_loaded' ) );
 }

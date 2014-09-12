@@ -189,10 +189,8 @@ class Syrup {
         return $num;
     }
 
-    public static function plugin_install() {
+    private static function determine_charset_collate() {
         global $wpdb;
-
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
         $charset_collate = '';
         if ( ! empty( $wpdb->charset ) ) {
@@ -201,6 +199,16 @@ class Syrup {
         if ( ! empty( $wpdb->collate ) ) {
             $charset_collate .= " COLLATE {$wpdb->collate}";
         }
+
+        return $charset_collate;
+    }
+
+    public static function plugin_install() {
+        global $wpdb;
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+
+        $charset_collate = determine_charset_collate();
 
         $table_name = $wpdb->prefix . 'syrup_shops';
         $sql = "CREATE TABLE $table_name (
@@ -239,6 +247,36 @@ class Syrup {
                 UNIQUE KEY id (group_id)
                 ) $charset_collate;";
         dbDelta( $sql );
+
+        add_option( 'syrup_db_version', SYRUP_DB_VERSION );
+    }
+
+    public static function hook_plugins_loaded() {
+        global $wpdb;
+
+        $db_version = get_option( 'syrup_db_version' );
+        if ( $db_version != SYRUP_DB_VERSION ) {
+            $table_name = $wpdb->prefix . 'syrup_shop_hours';
+
+            // Add column
+            $wpdb->query(
+                "
+                ALTER TABLE $table_name
+                ADD last_order smallint(6) UNSIGNED NOT NULL
+                AFTER open;
+                "
+            );
+
+            // Set default values
+            $wpdb->query(
+                "
+                UPDATE $table_name
+                SET last_order = close;
+                "
+            );
+
+            update_option( 'syrup_db_version', SYRUP_DB_VERSION );
+        }
     }
 
     public static function hook_wp_enqueue_scripts() {
