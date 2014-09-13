@@ -103,7 +103,7 @@ class Syrup {
 
         $cond_list = array();
         foreach ( $now_list as $now ) {
-            array_push( $cond_list, "open <= $now AND close > $now" );
+            array_push( $cond_list, "(open <= $now AND IF(last_order > 0, last_order, close) > $now)" );
         }
 
         $time_cond = join( ' OR ', $cond_list );
