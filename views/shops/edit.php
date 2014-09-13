@@ -90,12 +90,18 @@
         <div id="syrup-shop-hours-editor-template">
             <li>
                 <input type="text" name="hour_open_h[]" size="2" maxlength="2" />
-                :
+                <span>:</span>
                 <input type="text" name="hour_open_m[]" size="2" maxlength="2" />
-                -
+                <span>-</span>
                 <input type="text" name="hour_close_h[]" size="2" maxlength="2" />
-                :
+                <span>:</span>
                 <input type="text" name="hour_close_m[]" size="2" maxlength="2" />
+
+                <span>(L.O. </span>
+                <input type="text" name="hour_last_h[]" size="2" maxlength="2" />
+                <span>:</span>
+                <input type="text" name="hour_last_m[]" size="2" maxlength="2" />
+                <span>)</span>
 
                 <span class="wd-group">
                     <?php foreach ( $wd_list as $key => $wd ): ?>
@@ -119,14 +125,21 @@
                 <?php foreach ( $hours as $shop_hour ): ?>
                 <?php $open = sprintf( '%04d', $shop_hour['open'] ); ?>
                 <?php $close = sprintf( '%04d', $shop_hour['close'] ); ?>
+                <?php $last = sprintf( '%04d', $shop_hour['last_order'] ); ?>
                 <li>
                     <input type="text" name="hour_open_h[]" value="<?= intval( mb_substr( $open, 0, 2 ) ) ?>" size="2" maxlength="2" />
-                    :
+                    <span>:</span>
                     <input type="text" name="hour_open_m[]" value="<?= intval( mb_substr( $open, 2, 2 ) ) ?>" size="2" maxlength="2" />
-                    -
+                    <span>-</span>
                     <input type="text" name="hour_close_h[]" value="<?= intval( mb_substr( $close, 0, 2 ) ) ?>" size="2" maxlength="2" />
-                    :
+                    <span>:</span>
                     <input type="text" name="hour_close_m[]" value="<?= intval( mb_substr( $close, 2, 2 ) ) ?>" size="2" maxlength="2" />
+
+                    <span>(L.O. </span>
+                    <input type="text" name="hour_last_h[]" value="<?= intval( mb_substr( $last, 0, 2 ) ) ?>" size="2" maxlength="2" />
+                    <span>:</span>
+                    <input type="text" name="hour_last_m[]" value="<?= intval( mb_substr( $last, 2, 2 ) ) ?>" size="2" maxlength="2" />
+                    <span>)</span>
 
                     <span class="wd-group">
                         <?php foreach ( $wd_list as $key => $wd ): ?>

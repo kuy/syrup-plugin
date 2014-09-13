@@ -184,7 +184,7 @@ class Syrup_Admin {
         // Enumerate new shop hours and insert them
         $i = 0;
         foreach ( $_POST['hour_open_h'] as $_ ) {
-            foreach ( array( 'hour_open_h', 'hour_open_m', 'hour_close_h', 'hour_close_m' ) as $key ) {
+            foreach ( array( 'hour_open_h', 'hour_open_m', 'hour_close_h', 'hour_close_m', 'hour_last_h', 'hour_last_m' ) as $key ) {
                 if ($_POST[$key][$i] == '') {
                     $_POST[$key][$i] = '0';
                 }
@@ -192,10 +192,12 @@ class Syrup_Admin {
 
             $open = 100 * intval($_POST['hour_open_h'][$i]) + intval($_POST['hour_open_m'][$i]);
             $close = 100 * intval($_POST['hour_close_h'][$i]) + intval($_POST['hour_close_m'][$i]);
+            $last = 100 * intval($_POST['hour_last_h'][$i]) + intval($_POST['hour_last_m'][$i]);
 
             $wpdb->insert( $table_name, array(
                 'shop_id' => $shop_id,
                 'open' => $open,
+                'last_order' => $last,
                 'close' => $close,
                 'wd0' => $_POST['hour_wd0'][$i] == 'on',
                 'wd1' => $_POST['hour_wd1'][$i] == 'on',
@@ -204,7 +206,7 @@ class Syrup_Admin {
                 'wd4' => $_POST['hour_wd4'][$i] == 'on',
                 'wd5' => $_POST['hour_wd5'][$i] == 'on',
                 'wd6' => $_POST['hour_wd6'][$i] == 'on',
-            ), array( '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d' ) );
+            ), array( '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d' ) );
 
             $i++;
         }
