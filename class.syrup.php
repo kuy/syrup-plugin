@@ -64,10 +64,9 @@ class Syrup {
         return $shops;
     }
 
-    public static function get_shops_by_category( $category ) {
+    public static function get_shops_by_category( $tags ) {
         $shops = array();
-        $cat = get_category_by_slug( $category );
-        $posts = get_posts( array( 'category' => $cat->term_id, 'posts_per_page' => 200 ) );
+        $posts = get_posts( array( 'tag' => $tags, 'posts_per_page' => 200 ) );
 
         foreach ( $posts as $post ) {
             $items = self::get_shops( $post->ID );
@@ -93,7 +92,7 @@ class Syrup {
         return $shops;
     }
 
-    public static function get_shops_of_open( $category ) {
+    public static function get_shops_of_open() {
         global $wpdb;
 
         $now_list = array( intval( strftime( '%H%M' ), 10 ) + 900 );
@@ -289,15 +288,15 @@ class Syrup {
         $target_id = get_the_ID();
 
         if ( is_page( $target_id ) ) {
-            $cat = get_post_meta( $target_id, 'syrup-category', true );
+            $tags = get_post_meta( $target_id, 'syrup-tags', true );
             $type = get_post_meta( $target_id, 'syrup-type', true );
 
             switch ($type) {
                 case 'area':
-                    $shops = self::get_shops_by_category( $cat );
+                    $shops = self::get_shops_by_category( $tags );
                     break;
                 case 'now':
-                    $shops = self::get_shops_of_open( $cat );
+                    $shops = self::get_shops_of_open();
                     break;
             }
         } else if ( is_single( $target_id ) ) {
@@ -316,13 +315,13 @@ class Syrup {
         $items = join( ', ', $items );
         $content .= "<script>SPOTS = [{$items}];</script>";
 
+        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;"></div>';
+
         $content .= '<ul>';
         foreach ( $shops as $shop ) {
             $content .= "<li>{$shop['name']}</li>";
         }
         $content .= '</ul>';
-
-        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;"></div>';
 
         return $content;
     }
