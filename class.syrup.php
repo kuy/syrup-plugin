@@ -208,7 +208,7 @@ class Syrup {
 
         require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
-        $charset_collate = determine_charset_collate();
+        $charset_collate = self::determine_charset_collate();
 
         $table_name = $wpdb->prefix . 'syrup_shops';
         $sql = "CREATE TABLE $table_name (
