@@ -203,79 +203,91 @@ class Syrup {
     }
 
     public static function plugin_install() {
-        global $wpdb;
-
-        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-
-        $charset_collate = self::determine_charset_collate();
-
-        $table_name = $wpdb->prefix . 'syrup_shops';
-        $sql = "CREATE TABLE $table_name (
-                shop_id mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
-                name tinytext NOT NULL,
-                lat double,
-                lng double,
-                url text,
-                post_id bigint(20) UNSIGNED,
-                group_id mediumint(9) UNSIGNED,
-                UNIQUE KEY id (shop_id)
-                ) $charset_collate;";
-        dbDelta( $sql );
-
-        $table_name = $wpdb->prefix . 'syrup_shop_hours';
-        $sql = "CREATE TABLE $table_name (
-                shop_hour_id mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
-                shop_id mediumint(9) UNSIGNED NOT NULL,
-                open smallint(6) UNSIGNED NOT NULL,
-                close smallint(6) UNSIGNED NOT NULL,
-                wd0 bool DEFAULT false NOT NULL,
-                wd1 bool DEFAULT false NOT NULL,
-                wd2 bool DEFAULT false NOT NULL,
-                wd3 bool DEFAULT false NOT NULL,
-                wd4 bool DEFAULT false NOT NULL,
-                wd5 bool DEFAULT false NOT NULL,
-                wd6 bool DEFAULT false NOT NULL,
-                UNIQUE KEY id (shop_hour_id)
-                ) $charset_collate;";
-        dbDelta( $sql );
-
-        $table_name = $wpdb->prefix . 'syrup_groups';
-        $sql = "CREATE TABLE $table_name (
-                group_id mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
-                name tinytext NOT NULL,
-                UNIQUE KEY id (group_id)
-                ) $charset_collate;";
-        dbDelta( $sql );
-
-        add_option( 'syrup_db_version', SYRUP_DB_VERSION );
+        add_option( 'syrup_db_version', '0' );
     }
 
     public static function hook_plugins_loaded() {
+        $db_version = get_option( 'syrup_db_version' );
+        while ( (int)$db_version < (int)SYRUP_DB_VERSION ) {
+            $next_version = (int)$db_version + 1;
+            self::execute_migration( (string)$next_version );
+            $db_version = get_option( 'syrup_db_version' );
+        }
+    }
+
+    private static function execute_migration( $version ) {
         global $wpdb;
 
-        $db_version = get_option( 'syrup_db_version' );
-        if ( $db_version != SYRUP_DB_VERSION ) {
-            $table_name = $wpdb->prefix . 'syrup_shop_hours';
+        switch ($version) {
+            case '1':
+                require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
-            // Add column
-            $wpdb->query(
-                "
-                ALTER TABLE $table_name
-                ADD last_order smallint(6) UNSIGNED NOT NULL
-                AFTER open;
-                "
-            );
+                $charset_collate = self::determine_charset_collate();
 
-            // Set default values
-            $wpdb->query(
-                "
-                UPDATE $table_name
-                SET last_order = close;
-                "
-            );
+                $table_name = $wpdb->prefix . 'syrup_shops';
+                $sql = "CREATE TABLE $table_name (
+                        shop_id mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
+                        name tinytext NOT NULL,
+                        lat double,
+                        lng double,
+                        url text,
+                        post_id bigint(20) UNSIGNED,
+                        group_id mediumint(9) UNSIGNED,
+                        UNIQUE KEY id (shop_id)
+                        ) $charset_collate;";
+                dbDelta( $sql );
 
-            update_option( 'syrup_db_version', SYRUP_DB_VERSION );
+                $table_name = $wpdb->prefix . 'syrup_shop_hours';
+                $sql = "CREATE TABLE $table_name (
+                        shop_hour_id mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
+                        shop_id mediumint(9) UNSIGNED NOT NULL,
+                        open smallint(6) UNSIGNED NOT NULL,
+                        close smallint(6) UNSIGNED NOT NULL,
+                        wd0 bool DEFAULT false NOT NULL,
+                        wd1 bool DEFAULT false NOT NULL,
+                        wd2 bool DEFAULT false NOT NULL,
+                        wd3 bool DEFAULT false NOT NULL,
+                        wd4 bool DEFAULT false NOT NULL,
+                        wd5 bool DEFAULT false NOT NULL,
+                        wd6 bool DEFAULT false NOT NULL,
+                        UNIQUE KEY id (shop_hour_id)
+                        ) $charset_collate;";
+                dbDelta( $sql );
+
+                $table_name = $wpdb->prefix . 'syrup_groups';
+                $sql = "CREATE TABLE $table_name (
+                        group_id mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
+                        name tinytext NOT NULL,
+                        UNIQUE KEY id (group_id)
+                        ) $charset_collate;";
+                dbDelta( $sql );
+
+                break;
+
+            case '2':
+                $table_name = $wpdb->prefix . 'syrup_shop_hours';
+
+                // Add column
+                $wpdb->query(
+                    "
+                    ALTER TABLE $table_name
+                    ADD last_order smallint(6) UNSIGNED NOT NULL
+                    AFTER open;
+                    "
+                );
+
+                // Set default values
+                $wpdb->query(
+                    "
+                    UPDATE $table_name
+                    SET last_order = close;
+                    "
+                );
+
+                break;
         }
+
+        update_option( 'syrup_db_version', $version );
     }
 
     public static function hook_wp_enqueue_scripts() {
