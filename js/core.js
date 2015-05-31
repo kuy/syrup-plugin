@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
       }
     }
 
-    var coord, pos;
+    var coord, pos, marker, info;
     var map = new google.maps.Map(document.getElementById('syrup-map'), {});
     var bounds = new google.maps.LatLngBounds();
 
@@ -15,10 +15,16 @@ jQuery(document).ready(function($) {
       coord = spots[i].coordinate.split(', ');
       pos = new google.maps.LatLng(parseFloat(coord[0]), parseFloat(coord[1]));
       bounds.extend(pos);
-      new google.maps.Marker({
+      marker = new google.maps.Marker({
         position: pos,
         map: map,
         title: spots[i].name
+      });
+      info = new google.maps.InfoWindow({
+        content: '<div class="syrup-info"><h3>' + spots[i].name + '</h3></div>'
+      });
+      google.maps.event.addListener(marker, 'click', function(){
+        info.open(map, marker);
       });
     }
 

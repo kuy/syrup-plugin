@@ -8,3 +8,9 @@
     height: 0;
     overflow: hidden;
 }
+
+.syrup-info h3 {
+    font-size: 1.1em;
+    margin: 0;
+    margin-top: 3px;
+}
