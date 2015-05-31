@@ -327,7 +327,7 @@ class Syrup {
         $items = join( ', ', $items );
         $content .= "<script>SPOTS = [{$items}];</script>";
 
-        $content .= '<div id="syrup-map" style="width: 640px; height: 320px;"></div>';
+        $content .= '<div id="syrup-map"></div>';
 
         $content .= '<ul>';
         foreach ( $shops as $shop ) {

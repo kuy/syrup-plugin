@@ -1,3 +1,10 @@
 #syrup-map img {
     max-width: none;
 }
+
+#syrup-map {
+    position: relative;
+    padding-bottom: 60%;
+    height: 0;
+    overflow: hidden;
+}
