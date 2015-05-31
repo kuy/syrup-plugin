@@ -21,11 +21,13 @@ jQuery(document).ready(function($) {
         title: spots[i].name
       });
       info = new google.maps.InfoWindow({
-        content: '<div class="syrup-info"><h3>' + spots[i].name + '</h3></div>'
+        content: '<div class="syrup-info"><h3><a href="' + spots[i].permalink + '">' + spots[i].name + ' &#187;</a></h3></div>'
       });
-      google.maps.event.addListener(marker, 'click', function(){
-        info.open(map, marker);
-      });
+      google.maps.event.addListener(marker, 'click', (function(info, marker){
+        return function(){
+          info.open(map, marker);
+        };
+      })(info, marker));
     }
 
     google.maps.event.addListenerOnce(map, 'bounds_changed', function(){

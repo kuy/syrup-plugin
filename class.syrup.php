@@ -319,8 +319,10 @@ class Syrup {
 
         $items = array();
         foreach ( $shops as $shop ) {
+            $permalink = get_permalink( $shop['post_id'] );
             $items[] = "{
                 name: '{$shop['name']}',
+                permalink: '{$permalink}',
                 coordinate: '{$shop['lat']}, {$shop['lng']}'
             }";
         }
