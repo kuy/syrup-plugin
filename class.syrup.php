@@ -14,6 +14,8 @@ class Syrup {
 
         add_action( 'wp_enqueue_scripts', array( 'Syrup', 'hook_wp_enqueue_scripts' ) );
         add_filter( 'the_content', array( 'Syrup', 'hook_the_content' ) );
+
+        add_action( 'wp_ajax_syrup_get_shops', array( 'Syrup', 'action_get_shops' ) );
     }
 
     public static function view( $name, array $args = array() ) {
@@ -64,7 +66,7 @@ class Syrup {
         return $shops;
     }
 
-    public static function get_shops_by_category( $tags ) {
+    public static function get_shops_by_tags( $tags ) {
         $shops = array();
         $posts = get_posts( array( 'tag' => $tags, 'posts_per_page' => 200 ) );
 
@@ -293,7 +295,8 @@ class Syrup {
     public static function hook_wp_enqueue_scripts() {
         wp_enqueue_style( 'syrup-style', SYRUP__PLUGIN_URL . 'css/style.css' );
         wp_enqueue_script( 'syrup-google-maps', '//maps.googleapis.com/maps/api/js?key=AIzaSyBKVdsaN43VQGayTc1thF-faFjpzZUrqCo' );
-        wp_enqueue_script( 'syrup-core', SYRUP__PLUGIN_URL . 'js/core.js', array( 'jquery' ) );
+        // wp_enqueue_script( 'syrup-core', SYRUP__PLUGIN_URL . 'js/core.js', array( 'jquery' ) );
+        wp_enqueue_script( 'syrup-app', SYRUP__PLUGIN_URL . 'js/app.js' );
     }
 
     public static function hook_the_content( $content ) {
@@ -305,7 +308,7 @@ class Syrup {
 
             switch ($type) {
                 case 'area':
-                    $shops = self::get_shops_by_category( $tags );
+                    $shops = self::get_shops_by_tags( $tags );
                     break;
                 case 'now':
                     $shops = self::get_shops_of_open();
@@ -327,7 +330,11 @@ class Syrup {
             }";
         }
         $items = join( ', ', $items );
-        $content .= "<script>SPOTS = [{$items}];</script>";
+        $endpoint = admin_url( 'admin-ajax.php' );
+        $content .= "<script>
+            ENDPOINT = '{$endpoint}';
+            SPOTS = [{$items}];
+        </script>";
 
         $content .= '<div id="syrup-map"></div>';
 
@@ -337,6 +344,36 @@ class Syrup {
         }
         $content .= '</ul>';
 
+        $content .= '<div>';
+        $content .= '<input id="syrup-get-shops-tags" type="text" value="cafe+tokyo" />';
+        $content .= '<button id="syrup-get-shops">GET shops</button>';
+        $content .= '</div>';
+
+        $content .= '<div id="syrup-container"></div>';
+
         return $content;
+    }
+
+    public static function action_get_shops() {
+        $tags = $_GET['tags'];
+        if ( !$tags ) {
+            wp_send_json_error();
+            return;
+        }
+
+        $shops = self::get_shops_by_tags( $tags );
+
+        $items = array();
+        foreach ( $shops as $shop ) {
+            $permalink = get_permalink( $shop['post_id'] );
+            $items[] = array(
+                'name' => $shop['name'],
+                'permalink' => $permalink,
+                'lat' => $shop['lat'],
+                'lng' => $shop['lng'],
+            );
+        }
+
+        wp_send_json_success( $items );
     }
 }
