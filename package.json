@@ -6,7 +6,6 @@
   "dependencies": {},
   "devDependencies": {
     "delorean": "^0.9.4",
-    "director": "^1.2.8",
     "gulp": "^3.9.0",
     "gulp-browserify": "^0.5.1",
     "gulp-cjsx": "^3.0.0",

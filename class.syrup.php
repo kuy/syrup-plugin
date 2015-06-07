@@ -300,6 +300,16 @@ class Syrup {
     }
 
     public static function hook_the_content( $content ) {
+        $endpoint = admin_url( 'admin-ajax.php' );
+        $content .= "<script>
+            ENDPOINT = '{$endpoint}';
+        </script>";
+
+        $content .= '<div id="syrup-container"></div>';
+
+        return $content;
+
+
         $target_id = get_the_ID();
 
         if ( is_page( $target_id ) ) {
@@ -330,7 +340,6 @@ class Syrup {
             }";
         }
         $items = join( ', ', $items );
-        $endpoint = admin_url( 'admin-ajax.php' );
         $content .= "<script>
             ENDPOINT = '{$endpoint}';
             SPOTS = [{$items}];
@@ -351,7 +360,7 @@ class Syrup {
 
         $content .= '<div id="syrup-container"></div>';
 
-        return $content;
+        // return $content;
     }
 
     public static function action_get_shops() {
