@@ -15,7 +15,8 @@ class Syrup {
         add_action( 'wp_enqueue_scripts', array( 'Syrup', 'hook_wp_enqueue_scripts' ) );
         add_filter( 'the_content', array( 'Syrup', 'hook_the_content' ) );
 
-        add_action( 'wp_ajax_syrup_get_shops', array( 'Syrup', 'action_get_shops' ) );
+        add_action( 'wp_ajax_nopriv_syrup_get_tags', array( 'Syrup', 'action_get_tags' ) );
+        add_action( 'wp_ajax_nopriv_syrup_get_shops', array( 'Syrup', 'action_get_shops' ) );
     }
 
     public static function view( $name, array $args = array() ) {
@@ -361,6 +362,23 @@ class Syrup {
         $content .= '<div id="syrup-container"></div>';
 
         // return $content;
+    }
+
+    public static function action_get_tags() {
+        $tags = get_tags();
+        $tag_group_labels = get_option( 'tag_group_labels', array() );
+
+        $items = array();
+        foreach ( $tags as $tag ) {
+            $items[] = array(
+                'term_id' => $tag->term_id,
+                'name' => $tag->name,
+                'slug' => $tag->slug,
+                'term_group' => $tag_group_labels[$tag->term_group],
+            );
+        }
+
+        wp_send_json_success( $items );
     }
 
     public static function action_get_shops() {
