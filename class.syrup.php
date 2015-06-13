@@ -15,6 +15,8 @@ class Syrup {
         add_action( 'wp_enqueue_scripts', array( 'Syrup', 'hook_wp_enqueue_scripts' ) );
         add_filter( 'the_content', array( 'Syrup', 'hook_the_content' ) );
 
+        add_action( 'wp_ajax_syrup_get_tags', array( 'Syrup', 'action_get_tags' ) );
+        add_action( 'wp_ajax_syrup_get_shops', array( 'Syrup', 'action_get_shops' ) );
         add_action( 'wp_ajax_nopriv_syrup_get_tags', array( 'Syrup', 'action_get_tags' ) );
         add_action( 'wp_ajax_nopriv_syrup_get_shops', array( 'Syrup', 'action_get_shops' ) );
     }
