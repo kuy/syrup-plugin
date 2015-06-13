@@ -396,6 +396,7 @@ class Syrup {
         foreach ( $shops as $shop ) {
             $permalink = get_permalink( $shop['post_id'] );
             $items[] = array(
+                'id' => $shop['shop_id'],
                 'name' => $shop['name'],
                 'permalink' => $permalink,
                 'lat' => $shop['lat'],

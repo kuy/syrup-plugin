@@ -11,71 +11,89 @@ window.SyrupStore = SyrupStore = Flux.createStore
     selected: {
       default: ['pickup']
     },
-    reloading: {
-      default: false
+    shops: {
+      default: []
     }
   }
 
   actions: {
-    'maps:reload': 'reload',
-    'maps:done': 'done',
-    'tag:set': 'setTags'
     'tag:select': 'selectTag',
     'tag:unselect': 'unselectTag',
-    'tag:toggle': 'toggleTag'
+    'tag:toggle': 'toggleTag',
+    'tag:load': 'loadTags',
+    'shop:search': 'searchShops'
   }
 
-  reload: ->
-    console.log "store: reload"
-    @set 'reloading', true
-
-  done: ->
-    console.log "store: done"
-    @set 'reloading', false
-
-  setTags: (tags) ->
-    console.log "store: set: #{tags}"
-    @set 'tags', tags
-
   selectTag: (tag) ->
-    console.log "store: select: #{tag}"
+    console.log "store: selectTag: #{tag}"
     @set 'selected', @state.selected.concat(tag)
 
+    do SyrupActionCreator.searchShops
+
   unselectTag: (tag) ->
-    console.log "store: unselect: #{tag}"
+    console.log "store: unselectTag: #{tag}"
     @set 'selected', (t for t in @state.selected when t isnt tag)
 
+    do SyrupActionCreator.searchShops
+
   toggleTag: (tag) ->
-    console.log "store: toggle: #{tag}"
+    console.log "store: toggleTag: #{tag}"
     @set 'selected', [tag]
+
+    do SyrupActionCreator.searchShops
+
+  loadTags: ->
+    console.log 'store: loadTags'
+
+    $.ajax {
+      method: 'GET',
+      url: ENDPOINT,
+      data: {
+        action: 'syrup_get_tags'
+      },
+      success: (data) =>
+        console.log "store: loadTags: loaded"
+        @set 'tags', (tag for tag in data.data)
+
+        do SyrupActionCreator.searchShops
+    }
+
+  searchShops: ->
+    console.log 'store: searchShops'
+
+    $.ajax {
+      method: 'GET',
+      url: ENDPOINT,
+      data: {
+        action: 'syrup_get_shops',
+        tags: @state.selected.join(',')
+      },
+      success: (data) =>
+        console.log "store: searchShops: loaded"
+        @set 'shops', data.data
+    }
 
 SyrupDispatcher = Flux.createDispatcher
 
-  reload: ->
-    if not @stores['app'].reloading
-      console.log "dispatch: reload"
-      @dispatch 'maps:reload'
-
-  done: ->
-    if not @stores['app'].reloading
-      console.log "dispatch: done"
-      @dispatch 'maps:done'
-
-  setTags: (tags) ->
-    console.log "dispatch: set: #{tags}"
-    @dispatch 'tag:set', tags
-
   selectTag: (tag) ->
-    console.log "dispatch: select: #{tag}"
+    console.log "dispatch: selectTag: #{tag}"
     @dispatch 'tag:select', tag
 
   unselectTag: (tag) ->
-    console.log "dispatch: unselect: #{tag}"
+    console.log "dispatch: unselectTag: #{tag}"
     @dispatch 'tag:unselect', tag
 
   toggleTag: (tag) ->
-    console.log "dispatch: toggle: #{tag}"
+    console.log "dispatch: toggleTag: #{tag}"
     @dispatch 'tag:toggle', tag
+
+  loadTags: ->
+    console.log "dispatch: loadTags"
+    @dispatch 'tag:load'
+
+  searchShops: ->
+    console.log "dispatch: searchShops"
+    @dispatch 'shop:search'
 
   getStores: ->
     {
@@ -84,44 +102,36 @@ SyrupDispatcher = Flux.createDispatcher
 
 SyrupActionCreator =
 
-  reload: ->
-    console.log "action: reload"
-    do SyrupDispatcher.reload
-
-  done: ->
-    console.log "action: done"
-    do SyrupDispatcher.done
-
-  setTags: (tags) ->
-    console.log "action: set: #{tags}"
-    SyrupDispatcher.setTags tags
-
   selectTag: (tag) ->
-    console.log "action: select: #{tag}"
+    console.log "action: selectTag: #{tag}"
     SyrupDispatcher.selectTag tag
 
   unselectTag: (tag) ->
-    console.log "action: unselect: #{tag}"
+    console.log "action: unselectTag: #{tag}"
     SyrupDispatcher.unselectTag tag
 
   toggleTag: (tag) ->
-    console.log "action: toggle: #{tag}"
+    console.log "action: toggleTag: #{tag}"
     SyrupDispatcher.toggleTag tag
+
+  loadTags: ->
+    console.log "action: loadTags"
+    do SyrupDispatcher.loadTags
+
+  searchShops: ->
+    console.log "action: searchShops"
+    do SyrupDispatcher.searchShops
 
 AreaSelector = React.createClass
 
-  mixins: [Flux.mixins.storeListener]
-
   handleChange: (e) ->
     SyrupActionCreator.toggleTag e.target.value
-    do SyrupActionCreator.reload
 
   render: ->
-    self = @
-    store = @getStore('app')
-    areas = (tag for tag in store.tags when tag.term_group == 'area')
+    selected = if 0 < @props.selected.length then @props.selected[0] else ''
+    areas = (tag for tag in @props.tags when tag.term_group == 'area')
 
-    <select onChange={self.handleChange} value={store.selected[0]}>
+    <select onChange={@handleChange} value={selected}>
       {areas.map (area) ->
         <option key={area.id} value={area.slug}>{area.name}</option>
       }
@@ -133,7 +143,6 @@ AreaCloudSelector = React.createClass
 
   handleClick: (e) ->
     SyrupActionCreator.toggleTag e.target.value
-    do SyrupActionCreator.reload
 
   render: ->
     self = @
@@ -149,50 +158,57 @@ AreaCloudSelector = React.createClass
       }
     </div>
 
+ShopCardList = React.createClass
+
+  render: ->
+    <div className=".shop-card-list">
+      {@props.shops.map (shop) ->
+        <ShopCard key={shop.id} shop={shop} />
+      }
+    </div>
+
+ShopCard = React.createClass
+
+  render: ->
+    <div className=".shop-card">
+      {@props.shop.name}
+    </div>
+
 GoogleMaps = React.createClass
 
   mixins: [Flux.mixins.storeListener]
 
   componentDidMount: ->
+    @shops = []
     node = React.findDOMNode(@)
     @markers = []
     @map = new google.maps.Map node, {}
 
-  storeDidChange: ->
-    console.log "changed"
+  storeDidChange: (name) ->
     self = @
-    store = @getStore('app')
+    store = @getStore name
 
-    if store.reloading
-      console.log "start reloading"
-      tags = store.selected.join(',')
-      $.ajax {
-        method: 'GET',
-        url: ENDPOINT,
-        data: {
-          action: 'syrup_get_shops',
-          tags: tags
-        },
-        success: (data) ->
-          console.log data
-          self.updateMarkers data.data
-          do SyrupActionCreator.done
-      }
+    shop_ids = (shop.id for shop in store.shops)
+    added_shops = (shop_id for shop_id in shop_ids when shop_id not in @shops)
+    removed_shops = (shop_id for shop_id in @shops when shop_id not in shop_ids)
 
-  updateMarkers: (spots) ->
+    if 0 < added_shops.length + removed_shops.length
+      @updateMarkers store.shops
+
+  updateMarkers: (shops) ->
     do @clearMarkers
-    return if not spots or spots.length == 0
+    return if not shops or shops.length == 0
 
     bounds = new google.maps.LatLngBounds()
-    for spot in spots
-      pos = new google.maps.LatLng parseFloat(spot.lat), parseFloat(spot.lng)
+    for shop in shops
+      pos = new google.maps.LatLng parseFloat(shop.lat), parseFloat(shop.lng)
       bounds.extend pos
-      marker = new google.maps.Marker { position: pos, map: @map, title: spot.name }
+      marker = new google.maps.Marker { position: pos, map: @map, title: shop.name }
       @markers.push marker
       info = new google.maps.InfoWindow {
         content: """
           <div class="syrup-info">
-            <h3><a href="#{spot.permalink}">#{spot.name}&#187;</a></h3>
+            <h3><a href="#{shop.permalink}">#{shop.name}&#187;</a></h3>
           </div>
         """
       }
@@ -218,26 +234,18 @@ SyrupApp = React.createClass
   mixins: [Flux.mixins.storeListener]
 
   componentDidMount: ->
-    $.ajax {
-      method: 'GET',
-      url: ENDPOINT,
-      data: {
-        action: 'syrup_get_tags'
-      },
-      success: (data) ->
-        console.log data
-        tags = (tag for tag in data.data)
-        SyrupActionCreator.setTags tags
-        do SyrupActionCreator.reload
-    }
+    do SyrupActionCreator.loadTags
 
   render: ->
+    store = @getStore('app')
+
     <div>
-      <AreaSelector />
+      <AreaSelector tags={store.tags} selected={store.selected} />
       <GoogleMaps />
+      <ShopCardList shops={store.shops} />
     </div>
 
 setTimeout ->
   window.mainView = React.render <SyrupApp dispatcher={SyrupDispatcher} />,
     document.getElementById('syrup-container')
-, 500
+, 200
