@@ -108,34 +108,26 @@ SyrupActionCreator =
     console.log "action: toggle: #{tag}"
     SyrupDispatcher.toggleTag tag
 
-TagSelector = React.createClass
+AreaSelector = React.createClass
 
   mixins: [Flux.mixins.storeListener]
 
   handleChange: (e) ->
-    if e.target.checked
-      SyrupActionCreator.selectTag e.target.value
-    else
-      SyrupActionCreator.unselectTag e.target.value
-
+    SyrupActionCreator.toggleTag e.target.value
     do SyrupActionCreator.reload
 
   render: ->
     self = @
     store = @getStore('app')
+    areas = (tag for tag in store.tags when tag.term_group == 'area')
 
-    <ul>
-      {store.tags.map (tag) ->
-        <li key={tag.id}>
-          <label>
-            <input type="checkbox" value={tag.slug} onChange={self.handleChange} defaultChecked={if tag.slug in store.selected then 'checked' else ''} />
-            {tag.term_group + ':' + tag.name}
-          </label>
-        </li>
+    <select onChange={self.handleChange} value={store.selected[0]}>
+      {areas.map (area) ->
+        <option key={area.id} value={area.slug}>{area.name}</option>
       }
-    </ul>
+    </select>
 
-AreaSelector = React.createClass
+AreaCloudSelector = React.createClass
 
   mixins: [Flux.mixins.storeListener]
 
