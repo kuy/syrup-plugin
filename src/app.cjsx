@@ -131,7 +131,7 @@ AreaSelector = React.createClass
     selected = if 0 < @props.selected.length then @props.selected[0] else ''
     areas = (tag for tag in @props.tags when tag.term_group == 'area')
 
-    <select onChange={@handleChange} value={selected}>
+    <select className="area-selector" onChange={@handleChange} value={selected}>
       {areas.map (area) ->
         <option key={area.id} value={area.slug}>{area.name}</option>
       }
@@ -161,7 +161,7 @@ AreaCloudSelector = React.createClass
 ShopCardList = React.createClass
 
   render: ->
-    <div className=".shop-card-list">
+    <div className="pure-g shop-card-list">
       {@props.shops.map (shop) ->
         <ShopCard key={shop.id} shop={shop} />
       }
@@ -170,8 +170,17 @@ ShopCardList = React.createClass
 ShopCard = React.createClass
 
   render: ->
-    <div className=".shop-card">
-      {@props.shop.name}
+    <div className="pure-u-1-2 pure-u-md-1-4 shop-card">
+      <a href={@props.shop.post_url}>
+        <img className="pure-img" src={@props.shop.thumbnail_url} />
+      </a>
+      <aside>
+        <span>
+          <a href={@props.shop.post_url}>
+            {@props.shop.name}
+          </a>
+        </span>
+      </aside>
     </div>
 
 GoogleMaps = React.createClass
@@ -182,7 +191,12 @@ GoogleMaps = React.createClass
     @shops = []
     node = React.findDOMNode(@)
     @markers = []
-    @map = new google.maps.Map node, {}
+    @map = new google.maps.Map node, {
+      panControl: false,
+      mapTypeControl: false,
+      scrollwheel: false,
+      keyboardShortcuts: false
+    }
 
   storeDidChange: (name) ->
     self = @
@@ -208,7 +222,7 @@ GoogleMaps = React.createClass
       info = new google.maps.InfoWindow {
         content: """
           <div class="syrup-info">
-            <h3><a href="#{shop.permalink}">#{shop.name}&#187;</a></h3>
+            <h3><a href="#{shop.post_url}">#{shop.name}&#187;</a></h3>
           </div>
         """
       }

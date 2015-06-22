@@ -296,9 +296,9 @@ class Syrup {
     }
 
     public static function hook_wp_enqueue_scripts() {
+        wp_enqueue_style( 'syrup-pure', SYRUP__PLUGIN_URL . 'css/pure.css' );
         wp_enqueue_style( 'syrup-style', SYRUP__PLUGIN_URL . 'css/style.css' );
         wp_enqueue_script( 'syrup-google-maps', '//maps.googleapis.com/maps/api/js?key=AIzaSyBKVdsaN43VQGayTc1thF-faFjpzZUrqCo' );
-        // wp_enqueue_script( 'syrup-core', SYRUP__PLUGIN_URL . 'js/core.js', array( 'jquery' ) );
         wp_enqueue_script( 'syrup-app', SYRUP__PLUGIN_URL . 'js/app.js' );
     }
 
@@ -395,10 +395,12 @@ class Syrup {
         $items = array();
         foreach ( $shops as $shop ) {
             $permalink = get_permalink( $shop['post_id'] );
+            $thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ), 'medium' );
             $items[] = array(
                 'id' => $shop['shop_id'],
                 'name' => $shop['name'],
-                'permalink' => $permalink,
+                'post_url' => $permalink,
+                'thumbnail_url' => $thumb[0],
                 'lat' => $shop['lat'],
                 'lng' => $shop['lng'],
             );
