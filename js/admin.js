@@ -42,6 +42,10 @@ jQuery(document).ready(function($) {
     var getPos = function(){
       var lat = root.find('input.lat').val();
       var lng = root.find('input.lng').val();
+      if (lat === '0' && lng === '0') {
+        lat = '35.680907802';
+        lng = '139.767122085';
+      }
       return new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
     };
     var setPos = function(pos){
@@ -53,7 +57,7 @@ jQuery(document).ready(function($) {
       var pos = getPos();
       var map = root.data('instance');
       if (!map) {
-        map = new google.maps.Map(document.getElementById(id), { zoom: 15 });
+        map = new google.maps.Map(document.getElementById(id), { zoom: 13 });
         root.data('instance', map);
       }
       map.setCenter(pos);
