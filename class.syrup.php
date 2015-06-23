@@ -390,20 +390,27 @@ class Syrup {
             return;
         }
 
-        $shops = self::get_shops_by_tags( $tags );
+        $open_shops = self::get_shops_of_open();
+        $open_ids = array();
+        foreach ( $open_shops as $shop ) {
+            $open_ids[] = $shop['shop_id'];
+        }
 
         $items = array();
+        $shops = self::get_shops_by_tags( $tags );
         foreach ( $shops as $shop ) {
-            $permalink = get_permalink( $shop['post_id'] );
-            $thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ), 'medium' );
-            $items[] = array(
-                'id' => $shop['shop_id'],
-                'name' => $shop['name'],
-                'post_url' => $permalink,
-                'thumbnail_url' => $thumb[0],
-                'lat' => $shop['lat'],
-                'lng' => $shop['lng'],
-            );
+            if ( in_array( $shop['shop_id'], $open_ids ) ) {
+                $permalink = get_permalink( $shop['post_id'] );
+                $thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ), 'medium' );
+                $items[] = array(
+                    'id' => $shop['shop_id'],
+                    'name' => $shop['name'],
+                    'post_url' => $permalink,
+                    'thumbnail_url' => $thumb[0],
+                    'lat' => $shop['lat'],
+                    'lng' => $shop['lng'],
+                );
+            }
         }
 
         wp_send_json_success( $items );
