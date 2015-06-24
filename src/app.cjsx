@@ -11,12 +11,16 @@ window.SyrupStore = SyrupStore = Flux.createStore
     selected: {
       default: ['pickup']
     },
+    now: {
+      default: 'on'
+    },
     shops: {
       default: []
     }
   }
 
   actions: {
+    'now:toggle': 'toggleNow',
     'tag:select': 'selectTag',
     'tag:unselect': 'unselectTag',
     'tag:toggle': 'toggleTag',
@@ -58,6 +62,12 @@ window.SyrupStore = SyrupStore = Flux.createStore
         do SyrupActionCreator.searchShops
     }
 
+  toggleNow: ->
+    console.log "store: toggleNow"
+    @set 'now', (if @state.now == 'on' then 'off' else 'on')
+
+    do SyrupActionCreator.searchShops
+
   searchShops: ->
     console.log 'store: searchShops'
 
@@ -66,7 +76,8 @@ window.SyrupStore = SyrupStore = Flux.createStore
       url: ENDPOINT,
       data: {
         action: 'syrup_get_shops',
-        tags: @state.selected.join(',')
+        tags: @state.selected.join(','),
+        now: @state.now
       },
       success: (data) =>
         console.log "store: searchShops: loaded"
@@ -90,6 +101,10 @@ SyrupDispatcher = Flux.createDispatcher
   loadTags: ->
     console.log "dispatch: loadTags"
     @dispatch 'tag:load'
+
+  toggleNow: ->
+    console.log "dispatch: toggleNow"
+    @dispatch 'now:toggle'
 
   searchShops: ->
     console.log "dispatch: searchShops"
@@ -117,6 +132,10 @@ SyrupActionCreator =
   loadTags: ->
     console.log "action: loadTags"
     do SyrupDispatcher.loadTags
+
+  toggleNow: ->
+    console.log "action: toggleNow"
+    do SyrupDispatcher.toggleNow
 
   searchShops: ->
     console.log "action: searchShops"
@@ -156,6 +175,17 @@ AreaCloudSelector = React.createClass
           <label htmlFor={"area-#{tag.slug}"}>{tag.name}</label>
         </div>
       }
+    </div>
+
+NowOption = React.createClass
+
+  handleClick: (e) ->
+    do SyrupActionCreator.toggleNow
+
+  render: ->
+    <div className="now-option"}}>
+      <input type="checkbox" id="syrup-option-now" onChange={@handleClick} defaultChecked={if @props.now == 'on' then 'checked' else ''} />
+      <label htmlFor="syrup-option-now">Now</label>
     </div>
 
 ShopCardList = React.createClass
@@ -254,7 +284,10 @@ SyrupApp = React.createClass
     store = @getStore('app')
 
     <div>
-      <AreaSelector tags={store.tags} selected={store.selected} />
+      <div>
+        <AreaSelector tags={store.tags} selected={store.selected} />
+        <NowOption now={store.now} />
+      </div>
       <GoogleMaps />
       <ShopCardList shops={store.shops} />
     </div>

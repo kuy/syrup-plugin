@@ -390,6 +390,8 @@ class Syrup {
             return;
         }
 
+        $now = $_GET['now'];
+
         $open_shops = self::get_shops_of_open();
         $open_ids = array();
         foreach ( $open_shops as $shop ) {
@@ -399,7 +401,7 @@ class Syrup {
         $items = array();
         $shops = self::get_shops_by_tags( $tags );
         foreach ( $shops as $shop ) {
-            if ( in_array( $shop['shop_id'], $open_ids ) ) {
+            if ( $now == 'off' || in_array( $shop['shop_id'], $open_ids ) ) {
                 $permalink = get_permalink( $shop['post_id'] );
                 $thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ), 'medium' );
                 $items[] = array(
