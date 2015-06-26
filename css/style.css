@@ -72,6 +72,10 @@
     height: 120px;
 }
 
+.shop-card .media-img img {
+    border-radius: 60px;
+}
+
 .shop-card .media-body {
     padding-left: 132px;
 }
