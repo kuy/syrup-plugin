@@ -7,7 +7,7 @@ var plumber = require('gulp-plumber');
 
 gulp.task('transpile', function() {
   gulp.src('src/*.cjsx')
-    .pipe(plumber())
+    .pipe(plumber(util.log))
     .pipe(watch('src/*.cjsx'))
     .pipe(cjsx({bare: true}))
     .pipe(gulp.dest('build'))

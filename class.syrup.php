@@ -403,7 +403,7 @@ class Syrup {
         foreach ( $shops as $shop ) {
             if ( $now == 'off' || in_array( $shop['shop_id'], $open_ids ) ) {
                 $permalink = get_permalink( $shop['post_id'] );
-                $thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ), 'medium' );
+                $thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ) );
                 $items[] = array(
                     'id' => $shop['shop_id'],
                     'name' => $shop['name'],

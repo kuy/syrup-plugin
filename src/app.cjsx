@@ -150,11 +150,13 @@ AreaSelector = React.createClass
     selected = if 0 < @props.selected.length then @props.selected[0] else ''
     areas = (tag for tag in @props.tags when tag.term_group == 'area')
 
-    <select className="area-selector" onChange={@handleChange} value={selected}>
-      {areas.map (area) ->
-        <option key={area.id} value={area.slug}>{area.name}</option>
-      }
-    </select>
+    <div className="pure-form">
+      <select className="area-selector" onChange={@handleChange} value={selected}>
+        {areas.map (area) ->
+          <option key={area.id} value={area.slug}>{area.name}</option>
+        }
+      </select>
+    </div>
 
 AreaCloudSelector = React.createClass
 
@@ -183,9 +185,11 @@ NowOption = React.createClass
     do SyrupActionCreator.toggleNow
 
   render: ->
-    <div className="now-option"}}>
-      <input type="checkbox" id="syrup-option-now" onChange={@handleClick} defaultChecked={if @props.now == 'on' then 'checked' else ''} />
-      <label htmlFor="syrup-option-now">Now</label>
+    <div className="now-option pure-form">
+      <label htmlFor="syrup-option-now" className="pure-checkbox">
+        <input id="syrup-option-now" type="checkbox" onChange={@handleClick} defaultChecked={if @props.now == 'on' then 'checked' else ''} />
+        Now
+      </label>
     </div>
 
 ShopCardList = React.createClass
@@ -200,17 +204,13 @@ ShopCardList = React.createClass
 ShopCard = React.createClass
 
   render: ->
-    <div className="pure-u-1-2 pure-u-md-1-4 shop-card">
-      <a href={@props.shop.post_url}>
-        <img className="pure-img" src={@props.shop.thumbnail_url} />
+    <div className="pure-u-1 pure-u-md-1-2 shop-card">
+      <a className="media-img" href={@props.shop.post_url}>
+        <img className="pure-img" width="135" height="135" src={@props.shop.thumbnail_url} />
       </a>
-      <aside>
-        <span>
-          <a href={@props.shop.post_url}>
-            {@props.shop.name}
-          </a>
-        </span>
-      </aside>
+      <div className="media-body">
+        <a href={@props.shop.post_url}>{@props.shop.name}</a>
+      </div>
     </div>
 
 GoogleMaps = React.createClass
@@ -284,7 +284,7 @@ SyrupApp = React.createClass
     store = @getStore('app')
 
     <div>
-      <div>
+      <div className="conditions">
         <AreaSelector tags={store.tags} selected={store.selected} />
         <NowOption now={store.now} />
       </div>
