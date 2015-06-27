@@ -28,8 +28,8 @@ class Syrup_Admin {
     public static function hook_admin_menu() {
         add_menu_page( 'Shops', 'Shops', 'manage_options', 'syrup', array( 'Syrup_Admin', 'view_shops_index' ) );
 
-        add_submenu_page( NULL, 'Add New Shop', '', 'manage_options', 'syrup-shops-new', array( 'Syrup_Admin', 'view_shops_new' ) );
-        add_submenu_page( NULL, 'Edit Shop', '', 'manage_options', 'syrup-shops-edit', array( 'Syrup_Admin', 'view_shops_edit' ) );
+        add_submenu_page( 'syrup', 'Add New Shop', 'Add New Shop', 'manage_options', 'syrup-shops-new', array( 'Syrup_Admin', 'view_shops_new' ) );
+        add_submenu_page( 'options.php', 'Edit Shop', 'Edit Shop', 'manage_options', 'syrup-shops-edit', array( 'Syrup_Admin', 'view_shops_edit' ) );
     }
 
     public static function view_shops_index() {
