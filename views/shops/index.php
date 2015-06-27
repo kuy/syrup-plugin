@@ -10,7 +10,8 @@
                 <th>ID</th>
                 <th>Name</th>
                 <th>Post</th>
-                <th>Group</th>
+                <th>Map?</th>
+                <th>Shop Hours?</th>
             </tr>
         </thead>
         <tbody>
@@ -31,15 +32,8 @@
                         </a>
                     <?php endif; ?>
                 </td>
-                <td>
-                    <?php
-                    $group = Syrup::get_group( $shop['group_id'] );
-                    if ($group): ?>
-                        <a href="<?= Syrup_Admin::url_groups_edit( $group['group_id'] ) ?>">
-                            <?= $group['name'] ?>
-                        </a>
-                    <?php endif; ?>
-                </td>
+                <td><?= Syrup_Admin::has_map( $shop ) ? 'YES' : 'NO' ?></td>
+                <td><?= Syrup_Admin::has_shop_hours( $shop ) ? 'YES' : 'NO' ?></td>
             </tr>
             <?php endforeach; ?>
         </tbody>

@@ -81,22 +81,6 @@ class Syrup {
         return $shops;
     }
 
-    public static function get_shops_by_group( $group_id ) {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'syrup_shops';
-        $shops = $wpdb->get_results(
-            "
-            SELECT *
-            FROM $table_name
-            WHERE group_id = $group_id
-            LIMIT 200
-            "
-        , ARRAY_A );
-
-        return $shops;
-    }
-
     public static function get_shops_of_open() {
         global $wpdb;
 
@@ -148,51 +132,6 @@ class Syrup {
         return $shop_hours;
     }
 
-    public static function get_group( $group_id ) {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'syrup_groups';
-        $group = $wpdb->get_row(
-            "
-            SELECT *
-            FROM $table_name
-            WHERE group_id = $group_id
-            "
-        , ARRAY_A );
-
-        return $group;
-    }
-
-    public static function get_groups() {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'syrup_groups';
-        $groups = $wpdb->get_results(
-            "
-            SELECT *
-            FROM $table_name
-            LIMIT 200
-            "
-        , ARRAY_A );
-
-        return $groups;
-    }
-
-    public static function get_num_of_shops( $group_id ) {
-        global $wpdb;
-
-        $table_name = $wpdb->prefix . 'syrup_shops';
-        $num = $wpdb->get_var(
-            "
-            SELECT COUNT(*)
-            FROM $table_name
-            WHERE group_id = $group_id
-            "
-        );
-
-        return $num;
-    }
-
     private static function determine_charset_collate() {
         global $wpdb;
 
@@ -237,7 +176,6 @@ class Syrup {
                         lng double,
                         url text,
                         post_id bigint(20) UNSIGNED,
-                        group_id mediumint(9) UNSIGNED,
                         UNIQUE KEY id (shop_id)
                         ) $charset_collate;";
                 dbDelta( $sql );
@@ -256,14 +194,6 @@ class Syrup {
                         wd5 bool DEFAULT false NOT NULL,
                         wd6 bool DEFAULT false NOT NULL,
                         UNIQUE KEY id (shop_hour_id)
-                        ) $charset_collate;";
-                dbDelta( $sql );
-
-                $table_name = $wpdb->prefix . 'syrup_groups';
-                $sql = "CREATE TABLE $table_name (
-                        group_id mediumint(9) UNSIGNED NOT NULL AUTO_INCREMENT,
-                        name tinytext NOT NULL,
-                        UNIQUE KEY id (group_id)
                         ) $charset_collate;";
                 dbDelta( $sql );
 

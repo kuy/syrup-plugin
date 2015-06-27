@@ -53,21 +53,6 @@
                         </select>
                     </td>
                 </tr>
-                <tr class="form-field">
-                    <th scope="row">
-                        <label for="shop_group_id">Group</label>
-                    </th>
-                    <td>
-                        <select id="shop_group_id" name="shop_group_id" value="<?= $shop['group_id'] ?>">
-                            <option value=""></option>
-                            <?php foreach ( Syrup::get_groups() as $group ): ?>
-                            <option value="<?= $group['group_id'] ?>" <?= $shop['group_id'] == $group['group_id'] ? 'selected="selected"' : '' ?>>
-                                <?= $group['name'] ?>
-                            </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </td>
-                </tr>
             </tbody>
         </table>
 
