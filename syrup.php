@@ -1,10 +1,10 @@
 <?php
 /*
 Plugin Name: Syrup
-Description: Creates the database for shop data and integrates into Wordpress.
-Version: 0.1.0
+Description: Provides features to manage a database of travel spots.
 Author: Yuki Kodama
 Author URI: http://endflow.net/
+Version: 1.0.0
 License: MIT
 */
 
