@@ -72,7 +72,7 @@ class Syrup_Admin {
             'post_id' => $_POST['shop_post_id'],
         ), array( '%s', '%f', '%f', '%s', '%d' ) );
 
-        wp_safe_redirect( self::url_shops_index() );
+        wp_safe_redirect( self::url_shops_edit( $wpdb->insert_id ) );
     }
 
     public static function action_shops_update() {
@@ -91,7 +91,7 @@ class Syrup_Admin {
 
         // TODO: handle error
 
-        wp_safe_redirect( self::url_shops_index() );
+        wp_safe_redirect( self::url_shops_edit( $shop_id ) );
     }
 
     public static function action_shop_hours_update() {
