@@ -32,8 +32,8 @@
                         </a>
                     <?php endif; ?>
                 </td>
-                <td><?= Syrup_Admin::has_map( $shop ) ? 'YES' : 'NO' ?></td>
-                <td><?= Syrup_Admin::has_shop_hours( $shop ) ? 'YES' : 'NO' ?></td>
+                <td><?= Syrup_Admin::has_map( $shop ) ? 'YES' : '<strong>NO</strong>' ?></td>
+                <td><?= Syrup_Admin::has_shop_hours( $shop ) ? 'YES' : '<strong>NO</strong>' ?></td>
             </tr>
             <?php endforeach; ?>
         </tbody>
