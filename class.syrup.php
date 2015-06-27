@@ -233,67 +233,23 @@ class Syrup {
     }
 
     public static function hook_the_content( $content ) {
-        $endpoint = admin_url( 'admin-ajax.php' );
-        $content .= "<script>
-            ENDPOINT = '{$endpoint}';
-        </script>";
+        $post_id = get_the_ID();
 
-        $content .= '<div id="syrup-container"></div>';
+        if ( is_single( $post_id ) ) {
+            $encoded = wp_json_encode( self::get_shops( $post_id ) );
+            $content .= "<script>
+                SHOPS = {$encoded};
+            </script>";
+            $content .= '<div id="syrup-map" class="syrup-map"></div>';
+        } else {
+            $endpoint = admin_url( 'admin-ajax.php' );
+            $content .= "<script>
+                ENDPOINT = '{$endpoint}';
+            </script>";
+            $content .= '<div id="syrup-container"></div>';
+        }
 
         return $content;
-
-
-        $target_id = get_the_ID();
-
-        if ( is_page( $target_id ) ) {
-            $tags = get_post_meta( $target_id, 'syrup-tags', true );
-            $type = get_post_meta( $target_id, 'syrup-type', true );
-
-            switch ($type) {
-                case 'area':
-                    $shops = self::get_shops_by_tags( $tags );
-                    break;
-                case 'now':
-                    $shops = self::get_shops_of_open();
-                    break;
-            }
-        } else if ( is_single( $target_id ) ) {
-            $shops = self::get_shops( $target_id );
-        } else {
-            return $content;
-        }
-
-        $items = array();
-        foreach ( $shops as $shop ) {
-            $permalink = get_permalink( $shop['post_id'] );
-            $items[] = "{
-                name: '{$shop['name']}',
-                permalink: '{$permalink}',
-                coordinate: '{$shop['lat']}, {$shop['lng']}'
-            }";
-        }
-        $items = join( ', ', $items );
-        $content .= "<script>
-            ENDPOINT = '{$endpoint}';
-            SPOTS = [{$items}];
-        </script>";
-
-        $content .= '<div id="syrup-map"></div>';
-
-        $content .= '<ul>';
-        foreach ( $shops as $shop ) {
-            $content .= "<li>{$shop['name']}</li>";
-        }
-        $content .= '</ul>';
-
-        $content .= '<div>';
-        $content .= '<input id="syrup-get-shops-tags" type="text" value="cafe+tokyo" />';
-        $content .= '<button id="syrup-get-shops">GET shops</button>';
-        $content .= '</div>';
-
-        $content .= '<div id="syrup-container"></div>';
-
-        // return $content;
     }
 
     public static function norm_tags( $raw_tags ) {

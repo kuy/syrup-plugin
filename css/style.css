@@ -1,3 +1,7 @@
+#syrup-map {
+    padding-bottom: 140px;
+}
+
 .syrup-map {
     position: relative;
     padding-bottom: 60%;
@@ -39,10 +43,6 @@
     background: lightgray;
 }
 
-.conditions {
-    padding: 12px;
-}
-
 .area-selector {
     margin-bottom: 12px;
     float: left;
@@ -53,7 +53,7 @@
 }
 
 .shop-card-list {
-    padding: 12px;
+    padding: 12px 0;
 }
 
 .shop-card {

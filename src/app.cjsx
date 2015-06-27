@@ -300,6 +300,30 @@ SyrupApp = React.createClass
     </div>
 
 setTimeout ->
-  window.mainView = React.render <SyrupApp dispatcher={SyrupDispatcher} />,
-    document.getElementById('syrup-container')
+  # Setup Syrup widget
+  if widget_node = document.getElementById('syrup-container')
+    window.mainView = React.render <SyrupApp dispatcher={SyrupDispatcher} />, widget_node
+
+  # Setup Google Maps for single page
+  if map_node = document.getElementById('syrup-map')
+    map = new google.maps.Map map_node, {
+      panControl: false,
+      mapTypeControl: false,
+      scrollwheel: false,
+      keyboardShortcuts: false,
+      streetViewControl: false,
+      zoomControl: false
+    }
+
+    bounds = new google.maps.LatLngBounds()
+    for shop in SHOPS
+      pos = new google.maps.LatLng parseFloat(shop.lat), parseFloat(shop.lng)
+      bounds.extend pos
+      marker = new google.maps.Marker { position: pos, map: map, title: shop.name }
+
+    google.maps.event.addListenerOnce map, 'bounds_changed', =>
+      map.setZoom 15 if 15 < map.getZoom()
+
+    map.fitBounds bounds
+
 , 200
