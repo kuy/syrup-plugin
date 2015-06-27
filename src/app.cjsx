@@ -153,7 +153,7 @@ AreaSelector = React.createClass
     <div className="pure-form">
       <select className="area-selector" onChange={@handleChange} value={selected}>
         {areas.map (area) ->
-          <option key={area.id} value={area.slug}>{area.name}</option>
+          <option key={area.term_id} value={area.slug}>{area.name}</option>
         }
       </select>
     </div>
@@ -204,12 +204,20 @@ ShopCardList = React.createClass
 ShopCard = React.createClass
 
   render: ->
+    tags = (tag for tag in @props.shop.post.tags when tag.term_group == 'genre')
     <div className="pure-u-1 pure-u-md-1-2 shop-card">
-      <a className="media-img" href={@props.shop.post_url}>
+      <a className="media-img" href={@props.shop.post.url}>
         <img className="pure-img" width="135" height="135" src={@props.shop.thumbnail_url} />
       </a>
       <div className="media-body">
-        <a href={@props.shop.post_url}>{@props.shop.name}</a>
+        <div>
+          <a href={@props.shop.post.url}>{@props.shop.name}</a>
+        </div>
+        <ul>
+          {tags.map (tag) ->
+            <li key={tag.term_id}>#{tag.slug}</li>
+          }
+        </ul>
       </div>
     </div>
 
@@ -219,9 +227,8 @@ GoogleMaps = React.createClass
 
   componentDidMount: ->
     @shops = []
-    node = React.findDOMNode(@)
     @markers = []
-    @map = new google.maps.Map node, {
+    @map = new google.maps.Map React.findDOMNode(@), {
       panControl: false,
       mapTypeControl: false,
       scrollwheel: false,
@@ -252,14 +259,14 @@ GoogleMaps = React.createClass
       info = new google.maps.InfoWindow {
         content: """
           <div class="syrup-info">
-            <h3><a href="#{shop.post_url}">#{shop.name}&#187;</a></h3>
+            <h3><a href="#{shop.post.url}">#{shop.name}&#187;</a></h3>
           </div>
         """
       }
 
-      google.maps.event.addListener marker, 'click', ((info, marker) ->
-        -> info.open @map, marker
-      )(info, marker)
+      google.maps.event.addListener marker, 'click', ((map, info, marker) ->
+        -> info.open(map, marker)
+      )(@map, info, marker)
 
     google.maps.event.addListenerOnce @map, 'bounds_changed', =>
       @map.setZoom 15 if 15 < @map.getZoom()

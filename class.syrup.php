@@ -296,21 +296,24 @@ class Syrup {
         // return $content;
     }
 
-    public static function action_get_tags() {
-        $tags = get_tags();
-        $tag_group_labels = get_option( 'tag_group_labels', array() );
+    public static function norm_tags( $raw_tags ) {
+        $groups = get_option( 'tag_group_labels', array() );
 
-        $items = array();
-        foreach ( $tags as $tag ) {
-            $items[] = array(
+        $tags = array();
+        foreach ( $raw_tags as $tag ) {
+            $tags[] = array(
                 'term_id' => $tag->term_id,
                 'name' => $tag->name,
                 'slug' => $tag->slug,
-                'term_group' => $tag_group_labels[$tag->term_group],
+                'term_group' => $groups[$tag->term_group],
             );
         }
 
-        wp_send_json_success( $items );
+        return $tags;
+    }
+
+    public static function action_get_tags() {
+        wp_send_json_success( self::norm_tags( get_tags() ) );
     }
 
     public static function action_get_shops() {
@@ -333,12 +336,17 @@ class Syrup {
         foreach ( $shops as $shop ) {
             if ( $now == 'off' || in_array( $shop['shop_id'], $open_ids ) ) {
                 $permalink = get_permalink( $shop['post_id'] );
-                $thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ) );
+                $post_tags = self::norm_tags( wp_get_post_tags( $shop['post_id'] ) );
+                $thumb_attr = wp_get_attachment_image_src( get_post_thumbnail_id( $shop['post_id'] ) );
                 $items[] = array(
                     'id' => $shop['shop_id'],
                     'name' => $shop['name'],
-                    'post_url' => $permalink,
-                    'thumbnail_url' => $thumb[0],
+                    'post' => array(
+                        'id' => $shop['post_id'],
+                        'url' => $permalink,
+                        'tags' => $post_tags,
+                    ),
+                    'thumbnail_url' => $thumb_attr[0],
                     'lat' => $shop['lat'],
                     'lng' => $shop['lng'],
                 );
