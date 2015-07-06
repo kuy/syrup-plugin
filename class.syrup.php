@@ -235,19 +235,19 @@ class Syrup {
     public static function hook_the_content( $content ) {
         $post_id = get_the_ID();
 
-        if ( is_single( $post_id ) ) {
-            $encoded = wp_json_encode( self::get_shops( $post_id ) );
-            $content .= "<script>
-                SHOPS = {$encoded};
-            </script>";
-            $content .= '<div id="syrup-map" class="syrup-map"></div>';
-        } else {
+        if ( is_front_page() ) {
             $endpoint = admin_url( 'admin-ajax.php' );
             $content .= "<script>
                 ENDPOINT = '{$endpoint}';
             </script>";
             $content .= '<div id="syrup-container"></div>';
-        }
+        } elseif ( is_single( $post_id ) ) {
+            $encoded = wp_json_encode( self::get_shops( $post_id ) );
+            $content .= "<script>
+                SHOPS = {$encoded};
+            </script>";
+            $content .= '<div id="syrup-map" class="syrup-map"></div>';
+        } 
 
         return $content;
     }
