@@ -1,13 +1,17 @@
-#syrup-shop-hours-editor-template {
-  display: none;
-}
-
 #syrup-shop-hours-editor .wd-group {
   margin: 0 14px;
 }
 
 #syrup-shop-hours-editor a.delete {
   color: red;
+}
+
+#syrup-shop-hours-editor .sep {
+    padding: 0 2px;
+}
+
+#syrup-shop-hours-editor .syrup-toggle input[type="checkbox"] + span {
+    padding-right: 6px;
 }
 
 #syrup-location-preview-map {

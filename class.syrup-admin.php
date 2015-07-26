@@ -122,13 +122,13 @@ class Syrup_Admin {
                 'open' => $open,
                 'last_order' => $last,
                 'close' => $close,
-                'wd0' => $_POST['hour_wd0'][$i] == 'on',
-                'wd1' => $_POST['hour_wd1'][$i] == 'on',
-                'wd2' => $_POST['hour_wd2'][$i] == 'on',
-                'wd3' => $_POST['hour_wd3'][$i] == 'on',
-                'wd4' => $_POST['hour_wd4'][$i] == 'on',
-                'wd5' => $_POST['hour_wd5'][$i] == 'on',
-                'wd6' => $_POST['hour_wd6'][$i] == 'on',
+                'wd0' => $_POST['hour_wd0'][$i] == '1',
+                'wd1' => $_POST['hour_wd1'][$i] == '1',
+                'wd2' => $_POST['hour_wd2'][$i] == '1',
+                'wd3' => $_POST['hour_wd3'][$i] == '1',
+                'wd4' => $_POST['hour_wd4'][$i] == '1',
+                'wd5' => $_POST['hour_wd5'][$i] == '1',
+                'wd6' => $_POST['hour_wd6'][$i] == '1',
             ), array( '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%d' ) );
 
             $i++;

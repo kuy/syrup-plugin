@@ -14,7 +14,7 @@ gulp.task('transpile', function() {
 });
 
 gulp.task('default', ['transpile'], function() {
-  gulp.src('build/app.js')
+  gulp.src('build/*.js')
     .pipe(plumber())
     .pipe(watch('build/*.js'))
     .pipe(browserify({insertGlobals: true}))
