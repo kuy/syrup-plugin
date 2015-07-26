@@ -4,7 +4,7 @@ Plugin Name: Syrup
 Description: Provides features to manage a database of travel spots.
 Author: Yuki Kodama
 Author URI: http://endflow.net/
-Version: 1.0.0
+Version: 1.0.2
 License: MIT
 */
 
@@ -14,7 +14,7 @@ if ( !function_exists( 'add_action' ) ) {
     exit;
 }
 
-define( 'SYRUP_VERSION', '0.1.0' );
+define( 'SYRUP_VERSION', '1.0.2' );
 define( 'SYRUP_DB_VERSION', '2' );
 define( 'SYRUP__MINIMUM_WP_VERSION', '3.9' );
 define( 'SYRUP__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
