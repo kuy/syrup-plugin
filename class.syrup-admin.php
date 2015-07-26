@@ -16,6 +16,7 @@ class Syrup_Admin {
         add_action( 'admin_menu', array( 'Syrup_Admin', 'hook_admin_menu' ) );
         add_action( 'admin_post_syrup_shops_create', array( 'Syrup_Admin', 'action_shops_create' ) );
         add_action( 'admin_post_syrup_shops_update', array( 'Syrup_Admin', 'action_shops_update' ) );
+        add_action( 'admin_post_syrup_shops_delete', array( 'Syrup_Admin', 'action_shops_delete' ) );
         add_action( 'admin_post_syrup_shop_hours_update', array( 'Syrup_Admin', 'action_shop_hours_update' ) );
     }
 
@@ -92,6 +93,19 @@ class Syrup_Admin {
         // TODO: handle error
 
         wp_safe_redirect( self::url_shops_edit( $shop_id ) );
+    }
+
+    public static function action_shops_delete() {
+        global $wpdb;
+
+        $shop_id = $_POST['shop_id'];
+
+        $table_name = $wpdb->prefix . 'syrup_shops';
+        $result = $wpdb->delete( $table_name, array( 'shop_id' => $shop_id ), array( '%d' ) );
+
+        // TODO: handle error
+
+        wp_safe_redirect( self::url_shops_index() );
     }
 
     public static function action_shop_hours_update() {

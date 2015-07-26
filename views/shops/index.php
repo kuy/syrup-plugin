@@ -12,6 +12,7 @@
                 <th>Post</th>
                 <th>Map?</th>
                 <th>Shop Hours?</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +35,13 @@
                 </td>
                 <td><?= Syrup_Admin::has_map( $shop ) ? 'YES' : '<strong>NO</strong>' ?></td>
                 <td><?= Syrup_Admin::has_shop_hours( $shop ) ? 'YES' : '<strong>NO</strong>' ?></td>
+                <td>
+                    <form action="admin-post.php" method="post">
+                        <input type="hidden" name="action" value="syrup_shops_delete">
+                        <input type="hidden" name="shop_id" value="<?= $shop['shop_id'] ?>">
+                        <input type="submit" value="Delete" />
+                    </form>
+                </td>
             </tr>
             <?php endforeach; ?>
         </tbody>
